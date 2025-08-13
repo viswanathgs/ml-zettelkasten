@@ -7,6 +7,7 @@
 - [ ] [2022] OpenCLIP: Reproducible scaling laws for contrastive language-image learning. <https://arxiv.org/abs/2212.07143>
   - [ ] OpenCLIP code: <https://github.com/mlfoundations/open_clip>
 - [X] [2023] MetaCLIP: Demystifying CLIP Data. <https://arxiv.org/abs/2309.16671>
+- [ ] [2022] RQ-Transformer: Autoregressive Image Generation using Residual Quantization. <https://arxiv.org/abs/2203.01941>
 - [ ] <https://arxiv.org/abs/2506.22355>
 - [ ] Cambrian (Saining): <https://cambrian-mllm.github.io/>, <https://arxiv.org/abs/2406.16860>
 - [ ] TODO vision transformer (ViT)

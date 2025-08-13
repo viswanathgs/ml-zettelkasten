@@ -3,10 +3,11 @@
 **Start:** 2025-07-16  
 **End:** TODO  
 
-- [ ] [2016] WaveNet: A Generative Model for Raw Audio. <https://arxiv.org/abs/1609.03499>
-- [ ] TODO wav2vec
-- [ ] TODO wav2vec 2.0
-- [ ] TODO Whisper
+- [ ] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
+- [ ] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
+- [ ] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. <https://arxiv.org/abs/2006.11477>
+- [ ] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
+- [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
 - [X] [2023] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
@@ -14,8 +15,16 @@
 - [ ] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
 - [ ] [2024] Faster Speech-Llama Inference with Multi-token Prediction. <https://arxiv.org/abs/2409.08148>
-- [ ] TODO moshi
-- [ ] TODO sesame blog
+- [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue. <https://arxiv.org/abs/2410.00037>
+- [ ] [2025] Sesame AI Conversational Speech Model. <https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice>
+
+## [2019] wav2vec: Unsupervised Pre-training for Speech Recognition
+
+**Date:** 2025-08-13
+**Arxiv:** <https://arxiv.org/abs/1904.05862>
+**Paperpile:** <https://app.paperpile.com/view/?id=6d1013f6-b029-4f6d-aaa3-4c264e08d651>
+
+- TODO
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
