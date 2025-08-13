@@ -10,7 +10,7 @@
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
 - [X] [2023] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
-- [ ] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
+- [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
 - [ ] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
 - [ ] [2024] Faster Speech-Llama Inference with Multi-token Prediction. <https://arxiv.org/abs/2409.08148>
@@ -105,3 +105,39 @@
       - **Coarse acoustic token generation:** Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the corase acoustic token completions.
       - **Fine acoustic token generation:** Concatenate the entire coarse acoustic token sequence (corresponding to the prompt as well as those generated above) along with the fine acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the fine acoustic model to generate the fine acoustic token completions.
       - **SoundStream decoder for audio generation:** Finally, feed all the acoustic tokens to the SoundStream decoder to reconstruct the audio waveform output $\hat{x}$.
+
+## [2023] AudioPaLM: A Large Language Model That Can Speak and Listen
+
+**Date:** 2025-07-16
+**Arxiv:** <https://arxiv.org/abs/2306.12925>
+**Paperpile:** <https://app.paperpile.com/view/?id=39010e7d-62e7-4c64-8166-71d7df2ed434>
+
+- Intro
+  - AudoPaLM: Fuses text and speech based LMs into a unified multimodal architecture. Combines the best of AudioLM and PaLM-2.
+  - Hitherto, although there have been LMs that combine text and audio (speech-to-text or text-to-speech models), the text tokens and audio tokens use different vocabularies. For example, in the case of AudioLM, although an autoregressive LM is a key component of the model, it's only trained on audio tokens (semantic and acoustic tokens obtained from w2v-BERT and SoundStream respectively, see AudioLM notes above). Among other things, audio and text token vocabularies being different means speech-to-text and text-to-speech will have to be two different models.
+  - **AudioPaLM combines text and audio vocabularies into a multimodal single vocabulary, allowing for training a single model in both directions and arbitrary interleaving of speech and text**. A single model can then do speech recognition, text-to-speech synthesis, and speech-to-speech translation, unifying tasks that are traditionally solved by heterogeneous models into a single architecture and training run.
+  - Initalized from a pretrained text-only LM such as PaLM-2.
+- Method:
+  - Decoder-only transformer to model sequences consisting of text and audio tokens. As far as the model is concerned, text and audio are just sequences of arbitrary integers, as the inputs are tokenized before feeding to the model, and any outputs are detokenized before being returned to a user of the model.
+  - **Audio tokenization/detokenization:** Similar to AudioLM but some tweaks.
+  - **Modifying text-only decoder to model both text and audio:**
+    - In the original text-only autoregressive transformer like PaLM, SentencePiece text tokens are converted to text token embeddings via an `nn.Embedding` layer of shape $V_T \times E$ where $V_T$ is the text token vocabulary size and $E$ the decoder architecture's embedding dim. At the other end, there's an output projection `nn.Linear` layer of shape $E \times V_T$ to produce the logits.
+    - Given audio token vocab size $V_A$ (such as from SoundStream or AudioLM tokenizer), the only change to the text-only autoregressive decoder arch is to increase the input `nn.Embedding` to be of shape $(V_T + V_A) \times E$ and the output `nn.Linear` to be of shape $E \times (V_T + V_A)$.
+    - The rows in the input token embedding and the output project layer weights that correspond to the text tokens, as well as the rest of the decoder layers, are initalized from a pretrained text-only autoregressive decoder model.
+- Training Tasks:
+  - Combinations of fields involved:
+    - audio
+    - transcript
+    - translated audio
+    - translated transcript.
+  - Tasks involved:
+    - **ASR (Automatic Speech Recognition):** audio -> transcript
+    - **AST (Automatic Speech Translation):** audio -> translated transcript
+    - **S2ST (Speech-to-Speech Translation):** audio -> translated audio
+    - **TTS (Text-to-Speech):** transcript -> audio
+    - **MT (Machine Translation):** transcript -> translated transcript
+  - Input prefixed with task tag to signal the model which task to perform, such as `[ASR French]`, `[TTS English]`, `[S2ST English French]` etc. The tag is tokenized using the normal text tokenizer of the model.
+  - **Task chaining:**
+    - Similar in spirit to chain of thought prompting, can prompt the model to output intermediate steps.
+    - Example, for `[S2ST English French]` can be alternatively prompted as `[ASR AST S2ST English French]` so that it outputs the intermediate English and French text transcriptions in addition to the final French audio.
+    - Note: This is not the same as calling the model three times. The model performs the task of `[ASR AST S2ST English French]` as a single autoregressive decoding process. This means it can attend to the intermediate decoding tokens (English and French text tokens in this example) to improve performance, in addition to attending to just the input tokens (English audio tokens) and the prior decoded output tokens (partial French audio tokens).
