@@ -3,7 +3,7 @@
 **Start:** 2025-07-16  
 **End:** TODO  
 
-- [ ] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
+- [X] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
 - [ ] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
 - [ ] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. <https://arxiv.org/abs/2006.11477>
 - [ ] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
@@ -24,7 +24,25 @@
 **Arxiv:** <https://arxiv.org/abs/1904.05862>
 **Paperpile:** <https://app.paperpile.com/view/?id=6d1013f6-b029-4f6d-aaa3-4c264e08d651>
 
-- TODO
+- Intro:
+  - Unsupervised pretraining of raw audio to improve supervised speech recognition.
+  - Pretrain a simple multilayer convnet optimized via a noise contrastive binary classification task on large amounts of unlabeled raw audio.
+- Model:
+  - Encoder network (causal conv): Takes raw audio samples $x$ and produces latent representations $z$
+  - Context network (causal conv): For a receptive field size $v$, takes multiple latent representations $(z_t, ..., z_{t-v})$ and outputs a single contextualized vector $c_t$.
+- Objective:
+  - Train the model to **have the context vector $c_t$ distinguish a latent representation k steps in the future $z_{t+k}$ from distractor/negative samples**.
+  - For a step size $k$,
+    - **loss for positive sample** $L_k^{pos} = \log \sigma(z_{t+k}h_k(c_t))$, where $h_k(c_t)$ is an affine transformation.
+    - **loss for negative sample** $L_k^{neg} = \log \sigma(-z'h_k(c_t))$, where $z'$ is the latent representation of the negative sample.
+    - **total contrastive loss** for step size $k$ is $L_k = \sum_{t=1}^{T-k} L_k^{pos} + \frac{\lambda}{T} L_k^{neg}$, where $\lambda$ is the number of negative samples and $T$ is the total sequence length.
+  - $L_k$ for various step sizes $k$ are computed and summed.
+- Results:
+  - How are the pretrained representations used to improve supervised ASR performance?
+    - **ASR models are trained with wav2vec's context representations as inputs instead of using log-mel filterbank features**.
+    - Notably, **the pretrained wav2vec model is not used as a checkpoint to finetune from**.
+    - wav2vec + ASR aren't trained end-to-end. wav2vec is first trained and frozen, and then its representations are used as inputs to train a CTC-style ASR model.
+  - Outperforms the best character-based ASR model at that time (DeepSpeech 2) using two orders of magnitude less labeled training data.
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
@@ -32,7 +50,7 @@
 **Arxiv:** <https://arxiv.org/abs/2107.03312>
 **Paperpile:** <https://app.paperpile.com/view/?id=402f89dc-31cb-4a1b-a930-92b10377ac4c>
 
-- Intro
+- Intro:
   - Two broad categories of audio codecs: (1) waveform codecs, (2) parametric codecs.
   - (1) waveform codecs: time-domain waveform to time-frequency domain, and then coefficients are quantized and entropy coded. High-quality reconstruction at medium/high bitrates, but coding artifacts at low bitrates.
   - (2) parametric codecs: using a parametric model prior that describes the audio synthesis process. The encoder estimates the parameters of the model which are then quantized, and the decoder reconstructs a time-domain waveform using a synthesis model driven by the quantized parameters. Unlike waveform codes, the goal is not faithful reconstruction, but to generate audio that is perceptionally similar to the original.
@@ -121,7 +139,7 @@
 **Arxiv:** <https://arxiv.org/abs/2306.12925>
 **Paperpile:** <https://app.paperpile.com/view/?id=39010e7d-62e7-4c64-8166-71d7df2ed434>
 
-- Intro
+- Intro:
   - AudoPaLM: Fuses text and speech based LMs into a unified multimodal architecture. Combines the best of AudioLM and PaLM-2.
   - Hitherto, although there have been LMs that combine text and audio (speech-to-text or text-to-speech models), the text tokens and audio tokens use different vocabularies. For example, in the case of AudioLM, although an autoregressive LM is a key component of the model, it's only trained on audio tokens (semantic and acoustic tokens obtained from w2v-BERT and SoundStream respectively, see AudioLM notes above). Among other things, audio and text token vocabularies being different means speech-to-text and text-to-speech will have to be two different models.
   - **AudioPaLM combines text and audio vocabularies into a multimodal single vocabulary, allowing for training a single model in both directions and arbitrary interleaving of speech and text**. A single model can then do speech recognition, text-to-speech synthesis, and speech-to-speech translation, unifying tasks that are traditionally solved by heterogeneous models into a single architecture and training run.
