@@ -26,23 +26,58 @@
 
 - Intro:
   - Unsupervised pretraining of raw audio to improve supervised speech recognition.
-  - Pretrain a simple multilayer convnet optimized via a noise contrastive binary classification task on large amounts of unlabeled raw audio.
-- Model:
+  - Pretrain a simple multilayer convnet optimized via a **noise contrastive binary classification task on large amounts of unlabeled raw audio**.
+  - The pretrained representations can then be used as inputs to train an ASR model, as opposed to using log-mel filterbank features.
+- wav2vec model:
   - Encoder network (causal conv): Takes raw audio samples $x$ and produces latent representations $z$
   - Context network (causal conv): For a receptive field size $v$, takes multiple latent representations $(z_t, ..., z_{t-v})$ and outputs a single contextualized vector $c_t$.
-- Objective:
-  - Train the model to **have the context vector $c_t$ distinguish a latent representation k steps in the future $z_{t+k}$ from distractor/negative samples**.
+- wav2vec objective:
+  - Train the model to **have the context vector $c_t$ distinguish a latent representation $k$ steps in the future $z_{t+k}$ from distractor/negative samples**.
   - For a step size $k$,
     - **loss for positive sample** $L_k^{pos} = \log \sigma(z_{t+k}h_k(c_t))$, where $h_k(c_t)$ is an affine transformation.
     - **loss for negative sample** $L_k^{neg} = \log \sigma(-z'h_k(c_t))$, where $z'$ is the latent representation of the negative sample.
     - **total contrastive loss** for step size $k$ is $L_k = \sum_{t=1}^{T-k} L_k^{pos} + \frac{\lambda}{T} L_k^{neg}$, where $\lambda$ is the number of negative samples and $T$ is the total sequence length.
   - $L_k$ for various step sizes $k$ are computed and summed.
-- Results:
+- ASR results using wav2vec pretrained representations:
   - How are the pretrained representations used to improve supervised ASR performance?
     - **ASR models are trained with wav2vec's context representations as inputs instead of using log-mel filterbank features**.
     - Notably, **the pretrained wav2vec model is not used as a checkpoint to finetune from**.
     - wav2vec + ASR aren't trained end-to-end. wav2vec is first trained and frozen, and then its representations are used as inputs to train a CTC-style ASR model.
   - Outperforms the best character-based ASR model at that time (DeepSpeech 2) using two orders of magnitude less labeled training data.
+
+## [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations
+
+**Date:** 2025-08-14
+**Arxiv:** <https://arxiv.org/abs/1910.05453>
+**Paperpile:** <https://app.paperpile.com/view/?id=c209ea0e-0adf-4d98-9821-fdb14c3c39bf>
+
+- Intro:
+  - vq-wav2vec (Vector Quantized wav2vec): wav2vec, but with discrete audio tokens rather than continuous embeddings.
+  - Uses either Gumbel-softmax or online k-means clustering (similar to VQ-VAE) to quantize dense audio representations.
+  - Discretization enables direct application of methods from NLP.
+- **Discretized speech training pipeline:**
+  - **(a) vq-wav2vec model** (Fig 1):
+    - In original wav2vec, we went from raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model trained to have $c_t$ classify latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+    - In vq-wav2vec, we insert a vector quantization module $q$ between $f$ and $g$ such that $f \colon X \to Z$, $q \colon Z \to \tilde{Z}$, and $g \colon \tilde{Z} \to C$. $q$ builds discrete representations and $\tilde{Z}$ is the quantized representation reconstruction.
+    - The quantization module replaces the original representation $z$ by $\tilde{z} = e_i$ from a fixed-size codebook $e \in R^{V × d}$, where $V$ is the codebook size and $d$ is the embedding dim (as in `nn.EmbeddingBag`).
+    - Loss: Same as wav2vec, except that the context network output $c_t$ predicts the future quantized latent representations $\tilde{z}_{t+k}$ rather than continous encoder output ${z}_{t+k}$.
+  - **(b) BERT on discrete audio tokens**: The discretization step allows a direct drop-in of algorithms from NLP which are built around discrete inputs. BERT encoder is trained on the discretized unlabeled audio tokens.
+  - **(c) ASR using BERT representations:** Acoustic models are trained on labeled speech data using BERT representations as inputs instead of log-mel spectrogram features.
+- **Two approaches to Vector Quantization:**
+  - **(1) Gumbel-Softmax:**
+    - TODO
+  - **(2) K-means:** <https://chatgpt.com/share/689f46dc-7978-8005-94d7-285099e82814>
+    - Quantization module $q$ is simply replacing $z$ by a $\tilde{z} = e_i$ from the codebook that's closest in terms of L2 distance.
+    - Unlike in Gumbel-Softmax, the above codebook lookup step is not differentiable anymore.
+    - **Loss $L_{vq-wav2vec}^{kmeans} = L_{wav2vec} + L_{codebook}$**
+      - **wav2vec loss:** $L_{wav2vec}$ is the same as wav2vec loss except that the context network predicts the quantized latent $\tilde{Z}$, and straight-through estimator (STE) is used to backprop all the way.
+      - **Codebook/commitment loss:** $L_{codebook} = \Vert z.detach() - \tilde{z} \Vert^2 + \Vert z - \tilde{z}.detach() \Vert^2$.
+        - The first term updates the chosen codebook entry $\tilde{z}$ to be closer to the frozen encoder representation $z$ (frozen due to stop-gradient).
+        - The second term updates the encoder output $z$ towards the chosen (and frozen) codebook vector $\tilde{z}$.
+        - This separation is more stable and avoids collapse rather than having a single $\Vert z - \tilde{z} \Vert^2$ term: <https://chatgpt.com/c/689e8361-ac38-8329-91b9-3d958b282100>
+    - **Note:** The above loss updates codebook using gradient descent, but subsequent works like SoundStream (below) switch to EMA (exponential moving average) updates for improved stability and don’t rely on gradient flow through discrete assignments which can be noisy.
+  - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in R^d$ by a single codebook entry $e_i \in R^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in R^{G
+  \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
@@ -56,11 +91,11 @@
   - (2) parametric codecs: using a parametric model prior that describes the audio synthesis process. The encoder estimates the parameters of the model which are then quantized, and the decoder reconstructs a time-domain waveform using a synthesis model driven by the quantized parameters. Unlike waveform codes, the goal is not faithful reconstruction, but to generate audio that is perceptionally similar to the original.
 - **Soundstream - e2e ML**
   - > SoundStream leverages  state-of-the-art  solutions  in  the  field of  neural  audio  synthesis,  and  introduces  a  new  learnable quantization module, to deliver audio at high perceptual quality, while operating at low-to-medium bitrates.
-  - (1) **Encoder (fully convolutional):** takes raw audio waveform and produces a stream of embeddings at a lower sampling rate.
+  - **(1) Encoder (fully convolutional):** takes raw audio waveform and produces a stream of embeddings at a lower sampling rate.
     - only causal conv: padding applied to the past and not to the future
     - 24kHz original waveform to 75Hz embeddings.
-  - (2) **RVQ (Residual Vector Quantizer):** a varaible number of residual vector quantizers that take the embeddings and quantize.
-  - (3) **Decoder (fully convolutional):** takes quantized embeddings and reconstructs an approximation of the original waveform.
+  - **(2) RVQ (Residual Vector Quantizer):** a varaible number of residual vector quantizers that take the embeddings and quantize.
+  - **(3) Decoder (fully convolutional):** takes quantized embeddings and reconstructs an approximation of the original waveform.
     - Transposed conv for upsampling, but otherwise similar to the encoder reversed.
     - 75Hz quantized embeddings to 24kHz reconstructed waveform.
   - Trained with both reconstruction and adversarial losses.
