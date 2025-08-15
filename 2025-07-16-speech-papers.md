@@ -24,21 +24,21 @@
 **Arxiv:** <https://arxiv.org/abs/1904.05862>
 **Paperpile:** <https://app.paperpile.com/view/?id=6d1013f6-b029-4f6d-aaa3-4c264e08d651>
 
-- Intro:
+- **Intro:**
   - Unsupervised pretraining of raw audio to improve supervised speech recognition.
   - Pretrain a simple multilayer convnet optimized via a **noise contrastive binary classification task on large amounts of unlabeled raw audio**.
   - The pretrained representations can then be used as inputs to train an ASR model, as opposed to using log-mel filterbank features.
-- wav2vec model:
-  - Encoder network (causal conv): Takes raw audio samples $x$ and produces latent representations $z$
-  - Context network (causal conv): For a receptive field size $v$, takes multiple latent representations $(z_t, ..., z_{t-v})$ and outputs a single contextualized vector $c_t$.
-- wav2vec objective:
+- **wav2vec model:**
+  - **Encoder network (causal conv):** Takes raw audio samples $x$ and produces latent representations $z$
+  - **Context network (causal conv):** For a receptive field size $v$, takes multiple latent representations $(z_t, ..., z_{t-v})$ and outputs a single contextualized vector $c_t$.
+- **wav2vec self-supervised contrastive pretraining objective:**
   - Train the model to **have the context vector $c_t$ distinguish a latent representation $k$ steps in the future $z_{t+k}$ from distractor/negative samples**.
   - For a step size $k$,
-    - **loss for positive sample** $L_k^{pos} = \log \sigma(z_{t+k}h_k(c_t))$, where $h_k(c_t)$ is an affine transformation.
-    - **loss for negative sample** $L_k^{neg} = \log \sigma(-z'h_k(c_t))$, where $z'$ is the latent representation of the negative sample.
-    - **total contrastive loss** for step size $k$ is $L_k = \sum_{t=1}^{T-k} L_k^{pos} + \frac{\lambda}{T} L_k^{neg}$, where $\lambda$ is the number of negative samples and $T$ is the total sequence length.
+    - **Loss for positive sample** $L_k^{pos} = \log \sigma(z_{t+k}h_k(c_t))$, where $h_k(c_t)$ is an affine transformation.
+    - **Loss for negative sample** $L_k^{neg} = \log \sigma(-z'h_k(c_t))$, where $z'$ is the latent representation of the negative sample.
+    - **Total contrastive loss** for step size $k$ is $L_k = \sum_{t=1}^{T-k} L_k^{pos} + \frac{\lambda}{T} L_k^{neg}$, where $\lambda$ is the number of negative samples and $T$ is the total sequence length.
   - $L_k$ for various step sizes $k$ are computed and summed.
-- ASR results using wav2vec pretrained representations:
+- **Downstream use - ASR using wav2vec pretrained representations:**
   - How are the pretrained representations used to improve supervised ASR performance?
     - **ASR models are trained with wav2vec's context representations as inputs instead of using log-mel filterbank features**.
     - Notably, **the pretrained wav2vec model is not used as a checkpoint to finetune from**.
@@ -51,7 +51,7 @@
 **Arxiv:** <https://arxiv.org/abs/1910.05453>
 **Paperpile:** <https://app.paperpile.com/view/?id=c209ea0e-0adf-4d98-9821-fdb14c3c39bf>
 
-- Intro:
+- **Intro:**
   - vq-wav2vec (Vector Quantized wav2vec): wav2vec, but with discrete audio tokens rather than continuous embeddings.
   - Uses either Gumbel-softmax or online k-means clustering (similar to VQ-VAE) to quantize dense audio representations.
   - Discretization enables direct application of methods from NLP.
@@ -78,6 +78,20 @@
     - **Note:** The above loss updates codebook using gradient descent, but subsequent works like SoundStream (below) switch to EMA (exponential moving average) updates for improved stability and don’t rely on gradient flow through discrete assignments which can be noisy.
   - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in R^d$ by a single codebook entry $e_i \in R^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in R^{G
   \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
+- **Conceptual Jumps:**
+  - **wav2vec -> vq-wav2vec:** Add discretization, make speech look like language tokens, apply BERT-style masked LM.
+
+## [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
+
+**Date:** 2025-08-15
+**Arxiv:** <https://arxiv.org/abs/2006.11477>
+**Paperpile:** <https://app.paperpile.com/view/?id=05c0051a-46ed-48fa-9fe6-e6d05ba821ef>
+
+- **Intro:**
+  - TODO
+- **Conceptual Jumps:**
+  - **wav2vec -> vq-wav2vec:** Add discretization, make speech look like language tokens, apply BERT-style masked LM.
+  - **vq-wav2vec -> wav2vec 2.0:** TODO
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
@@ -85,7 +99,7 @@
 **Arxiv:** <https://arxiv.org/abs/2107.03312>
 **Paperpile:** <https://app.paperpile.com/view/?id=402f89dc-31cb-4a1b-a930-92b10377ac4c>
 
-- Intro:
+- **Intro:**
   - Two broad categories of audio codecs: (1) waveform codecs, (2) parametric codecs.
   - (1) waveform codecs: time-domain waveform to time-frequency domain, and then coefficients are quantized and entropy coded. High-quality reconstruction at medium/high bitrates, but coding artifacts at low bitrates.
   - (2) parametric codecs: using a parametric model prior that describes the audio synthesis process. The encoder estimates the parameters of the model which are then quantized, and the decoder reconstructs a time-domain waveform using a synthesis model driven by the quantized parameters. Unlike waveform codes, the goal is not faithful reconstruction, but to generate audio that is perceptionally similar to the original.
@@ -123,7 +137,7 @@
     - **Adversarial loss** $L_{G}^{adversarial}$: Hinge loss forcing the generator to produce outputs that the discriminator classifies as "real" (+1) and not as "fake" (-1). $max(0, 1 - D(G(x)))$.
       - **Hinge loss:** Used for maximum margin classification (such as in SVM). $L(y') = max(0, 1 - y * y')$, where $y$ is the ground-truth class (either +1 or -1), and $y'$ is the predicted logit ("raw" output of the classifier's decision function, not the predicted class label). When $y$ and $y'$ have the same sign (meaning y predicts the right class) and $|y'| \ge 1$ (correct class prediction and enough margin), the loss is 0. When they have the same sign, but $|y'| \lt 1$ (correct class prediction, but not enough margin), the loss decreases linearly with $y'$. When they have opposite signs (incorrect class prediction), the loss increases linearly with $y'$. <https://en.wikipedia.org/wiki/Hinge_loss>.
     - **Discriminator loss** $L_{D}$: Hinge loss over the logits of the discriminator forcing it to classify $x$ as real (+1) and $G(x)$ as fake (-1). $max(0, 1 - D(x)) + max(0, 1 + D(G(x)))$.
-- Joint compression and enhancement:
+- **Joint compression and enhancement using FiLM conditioning:**
   - Typically, audio compression and audio enhancement are done by separate modules.
   - In SoundStream codec training, compression and enhancement is merged into a single model as follows:
     - FiLM (Feature-wise Linear  Modulation) conditioning based on a boolean `denoise` parameter.
@@ -136,17 +150,17 @@
 **Arxiv:** <https://arxiv.org/abs/2209.03143>
 **Paperpile:** <https://app.paperpile.com/view/?id=a0f4dbd9-e3c2-4c78-bdcc-8156542313b2>
 
-- Intro:
+- **Intro:**
   - > We  introduce  AudioLM,  a  framework  for  high- quality audio generation with long-term consistency. AudioLM maps the input audio to a sequence of discrete tokens and casts au- dio generation as a language modeling task in this representation space. We show how existing audio tokenizers provide different trade-offs between reconstruction quality and long-term structure, and  we  propose  a  hybrid  tokenization  scheme  to  achieve  both objectives. Namely, we leverage the discretized activations of a masked language model pre-trained on audio to capture long-term structure and the discrete codes produced by a neural audio codec to achieve high-quality synthesis. By training on large corpora of raw audio waveforms, AudioLM learns to generate natural and co- herent continuations given short prompts. When trained on speech, and  without  any  transcript  or  annotation,  AudioLM  generates syntactically and semantically plausible speech continuations while also maintaining speaker identity and prosody for unseen speakers. Furthermore, we demonstrate how our approach extends beyond speech by generating coherent piano music continuations, despite being  trained  without  any  symbolic  representation  of  music.
   - Achieves the objective of both high-quality audio generation as well as long-term coherent structure. Combines advances in neural audio compression (SoundStream), self-supervised speech pretraining (w2v-bert), and language modeling. Essentially, training a language model to generate both semantic and acoustic tokens simultaenously leads to high audio quality and long-term consistency.
     - **Semantic tokens (coarse):** constructed from a model pretrained with a self-supervised masked language modeling objective.
     - **Acoustic tokens (finer):** produced by SoundStream neural codec.
-- Three components of the model:
+- **Three components of the model:**
   - **(1) Tokenizer:** Takes a single-channel audio sequence $x \in R^T$ and produces a sequence of discrete tokens $h = enc(x)$ of length $T' \ll T$.
   - **(2) Decoder-only transformer language model** that operates on $h$ to predict the next sequence of tokes $\hat{h}$ autoregressively. Since $T' \ll T$, the language model can now capture long-term dependency more efficiently (as self-attention complexity grows quadratically wrt sequence length).
   - **(3) Detokenizer:** Maps the sequence of predicted tokens $\hat{h}$ to produce the output audio waveform $\hat{x} = dec(\hat{x})$.
   - In AudioLM, (1) and (3) are pretrained and frozen (such as from SoundStream and w2v-BERT), and only (2) is trained.
-- Details:
+- **Details:**
   - **Hybrid tokenization scheme** combining acoustic and semantic tokens:
     - **(i) Acoustic tokens** produced by SoundStream model (encoder + RVQ). See SoundStream notes for details. For a SoundStream model with $Q$ residual vector quantizers with $N$ bits allocated to each (such that the codebook size per quantizer is $2^N$), the raw audio waveform $x \in R^T$ is transformed to $y \in \{1,...,2^N\}^{T_A \times Q}$ discrete tokens, where $T/T_A$ is the downsampling factor of the SoundStream encoder.
     - **(ii) Semantic tokens** produced by an intermediate layer of w2v-BERT after applying k-means and using the centroid indices. With $K$ clusters, the raw audio waveform $x \in R^T$ is transformed to $z \in {1,...,K}^{T_S}$, where $T/T_S$ is the downsampling factor of the w2v-BERT encoder.
@@ -160,7 +174,7 @@
       - **Stage 2 (Coarse acoustic modeling):** Autoregressive next-token prediction trained on the coarse acoustic tokens from the first $Q'$ vector quantizers $(y_1^1, ..., y_1^{Q'}, y_2^1, ..., y_2^{Q'}, y_{T_A}^1, ..., y_{T_A}^{Q'})$ conditioned on the semantic tokens $(z_1, z_2, ..., z_{T_S})$.
       - **Stage 3 (Fine acoustic modeling):** Autoregressive next-token prediction trained on the fine acoustic tokens from the remaining $Q-Q'$ vector quantizers, conditioned on the coarse acoustic tokens from the first $Q'$ vector quantizers. There are no semantic tokens per per insight (b) above.
       - Stages 2 & 3 can be merged into a single stage (to just model the entire semantic and acoustic token sequence at once), but breaking it down this way improves efficiency by limiting the max sequence length needed to be dealt with.
-  - Inference:
+  - **Inference:**
     - Target application: Given an audio prompt $x$, generate continuations that maintain both semantic and acoustic coherence.
     - Steps:
       - **Semantic token generation:** First obtain semantic tokens corresponding to the prompt $x$ from w2v-BERT encoder and feed those into the transformer language model to generate semantic token completions.
@@ -174,25 +188,25 @@
 **Arxiv:** <https://arxiv.org/abs/2306.12925>
 **Paperpile:** <https://app.paperpile.com/view/?id=39010e7d-62e7-4c64-8166-71d7df2ed434>
 
-- Intro:
+- **Intro:**
   - AudoPaLM: Fuses text and speech based LMs into a unified multimodal architecture. Combines the best of AudioLM and PaLM-2.
   - Hitherto, although there have been LMs that combine text and audio (speech-to-text or text-to-speech models), the text tokens and audio tokens use different vocabularies. For example, in the case of AudioLM, although an autoregressive LM is a key component of the model, it's only trained on audio tokens (semantic and acoustic tokens obtained from w2v-BERT and SoundStream respectively, see AudioLM notes above). Among other things, audio and text token vocabularies being different means speech-to-text and text-to-speech will have to be two different models.
   - **AudioPaLM combines text and audio vocabularies into a multimodal single vocabulary, allowing for training a single model in both directions and arbitrary interleaving of speech and text**. A single model can then do speech recognition, text-to-speech synthesis, and speech-to-speech translation, unifying tasks that are traditionally solved by heterogeneous models into a single architecture and training run.
   - Initalized from a pretrained text-only LM such as PaLM-2.
-- Method:
+- **Method:**
   - Decoder-only transformer to model sequences consisting of text and audio tokens. As far as the model is concerned, text and audio are just sequences of arbitrary integers, as the inputs are tokenized before feeding to the model, and any outputs are detokenized before being returned to a user of the model.
   - **Audio tokenization/detokenization:** Similar to AudioLM but some tweaks.
   - **Modifying text-only decoder to model both text and audio:**
     - In the original text-only autoregressive transformer like PaLM, SentencePiece text tokens are converted to text token embeddings via an `nn.Embedding` layer of shape $V_T \times E$ where $V_T$ is the text token vocabulary size and $E$ the decoder architecture's embedding dim. At the other end, there's an output projection `nn.Linear` layer of shape $E \times V_T$ to produce the logits.
     - Given audio token vocab size $V_A$ (such as from SoundStream or AudioLM tokenizer), the only change to the text-only autoregressive decoder arch is to increase the input `nn.Embedding` to be of shape $(V_T + V_A) \times E$ and the output `nn.Linear` to be of shape $E \times (V_T + V_A)$.
     - The rows in the input token embedding and the output project layer weights that correspond to the text tokens, as well as the rest of the decoder layers, are initalized from a pretrained text-only autoregressive decoder model.
-- Training Tasks:
-  - Combinations of fields involved:
+- **Training Tasks:**
+  - **Combinations of fields involved:**
     - audio
     - transcript
     - translated audio
     - translated transcript.
-  - Tasks involved:
+  - **Tasks involved:**
     - **ASR (Automatic Speech Recognition):** audio -> transcript
     - **AST (Automatic Speech Translation):** audio -> translated transcript
     - **S2ST (Speech-to-Speech Translation):** audio -> translated audio
