@@ -28,10 +28,10 @@
   - Unsupervised pretraining of raw audio to improve supervised speech recognition.
   - Pretrain a simple multilayer convnet optimized via a **noise contrastive binary classification task on large amounts of unlabeled raw audio**.
   - The pretrained representations can then be used as inputs to train an ASR model, as opposed to using log-mel filterbank features.
-- **wav2vec model:**
+- **Model:**
   - **Encoder network (causal conv):** Takes raw audio samples $x$ and produces latent representations $z$
   - **Context network (causal conv):** For a receptive field size $v$, takes multiple latent representations $(z_t, ..., z_{t-v})$ and outputs a single contextualized vector $c_t$.
-- **wav2vec self-supervised contrastive pretraining objective:**
+- **Self-supervised contrastive pretraining objective:**
   - Train the model to **have the context vector $c_t$ distinguish a latent representation $k$ steps in the future $z_{t+k}$ from distractor/negative samples**.
   - For a step size $k$,
     - **Loss for positive sample** $L_k^{pos} = \log \sigma(z_{t+k}h_k(c_t))$, where $h_k(c_t)$ is an affine transformation.
@@ -56,17 +56,17 @@
   - Uses either Gumbel-softmax or online k-means clustering (similar to VQ-VAE) to quantize dense audio representations.
   - Discretization enables direct application of methods from NLP.
 - **Discretized speech training pipeline:**
-  - **(a) vq-wav2vec model** (Fig 1):
-    - In original wav2vec, we went from raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model trained to have $c_t$ classify latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+  - **(1) vq-wav2vec model** (Fig 1):
+    - In original wav2vec, we went from raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
     - In vq-wav2vec, we insert a vector quantization module $q$ between $f$ and $g$ such that $f \colon X \to Z$, $q \colon Z \to \tilde{Z}$, and $g \colon \tilde{Z} \to C$. $q$ builds discrete representations and $\tilde{Z}$ is the quantized representation reconstruction.
     - The quantization module replaces the original representation $z$ by $\tilde{z} = e_i$ from a fixed-size codebook $e \in R^{V × d}$, where $V$ is the codebook size and $d$ is the embedding dim (as in `nn.EmbeddingBag`).
     - Loss: Same as wav2vec, except that the context network output $c_t$ predicts the future quantized latent representations $\tilde{z}_{t+k}$ rather than continous encoder output ${z}_{t+k}$.
-  - **(b) BERT on discrete audio tokens**: The discretization step allows a direct drop-in of algorithms from NLP which are built around discrete inputs. BERT encoder is trained on the discretized unlabeled audio tokens.
-  - **(c) ASR using BERT representations:** Acoustic models are trained on labeled speech data using BERT representations as inputs instead of log-mel spectrogram features.
+  - **(2) BERT on discrete audio tokens**: The discretization step allows a direct drop-in of algorithms from NLP which are built around discrete inputs. BERT encoder is trained on the discretized unlabeled audio tokens.
+  - **(3) ASR using BERT representations:** Acoustic models are trained on labeled speech data using BERT representations as inputs instead of log-mel spectrogram features.
 - **Two approaches to Vector Quantization:**
-  - **(1) Gumbel-Softmax:**
+  - **(a) Gumbel-Softmax:**
     - TODO
-  - **(2) K-means:** <https://chatgpt.com/share/689f46dc-7978-8005-94d7-285099e82814>
+  - **(b) K-means:** <https://chatgpt.com/share/689f46dc-7978-8005-94d7-285099e82814>
     - Quantization module $q$ is simply replacing $z$ by a $\tilde{z} = e_i$ from the codebook that's closest in terms of L2 distance.
     - Unlike in Gumbel-Softmax, the above codebook lookup step is not differentiable anymore.
     - **Loss $L_{vq-wav2vec}^{kmeans} = L_{wav2vec} + L_{codebook}$**
@@ -79,6 +79,7 @@
   - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in R^d$ by a single codebook entry $e_i \in R^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in R^{G
   \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
 - **Conceptual Jumps:**
+  - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   - **wav2vec -> vq-wav2vec:** Add discretization, make speech look like language tokens, apply BERT-style masked LM.
 
 ## [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
@@ -88,10 +89,35 @@
 **Paperpile:** <https://app.paperpile.com/view/?id=05c0051a-46ed-48fa-9fe6-e6d05ba821ef>
 
 - **Intro:**
-  - TODO
+  - Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model.
+  - Instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly (with the whole network being trained e2e).
+  - Downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
+  - On Librispeech, outperforms previous SoTA with 100x less labeled data.
+- **Model:**
+  - **(1) Encoder network (temporal conv, $f \colon X \to Z$):** Takes raw audio $X$ and outputs latent representation $Z$.
+  - **(2) Context network (masked transformer, $g \colon Z \to C$):** Takes latent representation $Z$ with spans masked randomly, and outputs context embedding $C$.
+    - The **inputs to the context network are continuous latent embeddings, with the quantized latents only used as targets in the contrastive loss**. This is different from vq-wav2vec where the context network takes quantized latent reconstructions as inputs.
+    - Ablations over four combinations (inputs_to_tranformer={continuous,quantized} x contrastive_targets={continuous,quantized}) show continuous inputs and quantized targets to have the lowest WER after finetuning on Librispeech.
+    - This makes sense, as continuous latent representations retain more information to enable better context representations, and quantizing the target representations leads to more robust training.
+  - (3) **Quantization module ($q \colon Z \to Q$):** Continuous latent representation $Z$ to quantized targets $Q$ for contrastive loss.
+    - Gumbel-Softmax approach from vq-wav2vec.
+    - Product Quantization (PQ) with $G$ groups. Product  quantization  amounts  to  choosing  quantized  representations  from multiple codebooks and concatenating them.
+- **Objective:** Loss $L = L_{contrastive} + \alpha L_{codebook-diversity}$
+  - **Contrastive loss:** $L_{contrastive} = -\log \frac{\exp(sim(c_t, q_t) / \tau)}{\sum_{k=1}^{K+1} \exp(sim(c_t, q_k) / \tau)}$, where $sim(a, b) = \frac{ab}{\Vert a \Vert \Vert b \Vert}$ is the cosine similarity between context representations and quantized latent representations.
+    - Given context network output $c_t$ centered over masked time step $t$, the model needs to identify the true quantized latent representation $q_t$ amidst $K$ negative samples / distractors.
+    - Negatives/distractors are uniformly sampled from other masked time steps of the same utterance.
+    - **Notable difference from wav2vec:** wav2vec's contrastive loss takes a sigmoid cross-entropy formulation (multiple binary decisions, one per sample), where as wav2vec 2.0 takes a softmax cross-entropy formulation (categorial classification, single multinomial decision over all samples). <https://chatgpt.com/share/68a24514-7654-8005-ac77-5f6ddd099c57>
+  - **Codebook diversity loss:** $L_{codebook-diversity} = -H(\tilde{p}) / V = \frac{1}{V} \sum_{v=1}^{V} \tilde{p}_v \log \tilde{p}_v$
+    - $\tilde{p}_v$ is the softmax probability of choosing codebook entry $v$ (used for Gumbel-Softmax formulation, but softmax computed here without the Gumbel noise and temperature terms), averaged over all utterances in a batch.
+    - Encourages equal use of entries in the codebook by maximizing entropy of codebook selection in a batch.
+    - When there are $G$ codebooks due to Product Quantization, averaged over them accordingly.
+- **Downstream use - ASR finetuning:**
+  - Finetuning for ASR by adding a linear projection on top of the context network, and trained with CTC.
+  - Outperforms previous SoTA with 100x less labeled data on Librispeech.
 - **Conceptual Jumps:**
-  - **wav2vec -> vq-wav2vec:** Add discretization, make speech look like language tokens, apply BERT-style masked LM.
-  - **vq-wav2vec -> wav2vec 2.0:** TODO
+  - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+  **wav2vec -> vq-wav2vec:** Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
+  - **vq-wav2vec -> wav2vec 2.0:** Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
