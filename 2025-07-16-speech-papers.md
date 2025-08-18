@@ -5,8 +5,8 @@
 
 - [X] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
 - [ ] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
-- [ ] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. <https://arxiv.org/abs/2006.11477>
-- [ ] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
+- [X] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. <https://arxiv.org/abs/2006.11477>
+- [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
 - [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
@@ -43,6 +43,7 @@
     - **ASR models are trained with wav2vec's context representations as inputs instead of using log-mel filterbank features**.
     - Notably, **the pretrained wav2vec model is not used as a checkpoint to finetune from**.
     - wav2vec + ASR aren't trained end-to-end. wav2vec is first trained and frozen, and then its representations are used as inputs to train a CTC-style ASR model.
+  - **ASR Decoding:** Maximize $\log p_{CTC}(Y \mid C) + \alpha \log P_{LM}(Y) + \beta \lvert Y \rvert$, where $p_{LM}$ is a language model and the last term is the insertion bonus.
   - Outperforms the best character-based ASR model at that time (DeepSpeech 2) using two orders of magnitude less labeled training data.
 
 ## [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations
@@ -76,9 +77,10 @@
         - The second term updates the encoder output $z$ towards the chosen (and frozen) codebook vector $\tilde{z}$.
         - This separation is more stable and avoids collapse rather than having a single $\Vert z - \tilde{z} \Vert^2$ term: <https://chatgpt.com/c/689e8361-ac38-8329-91b9-3d958b282100>
     - **Note:** The above loss updates codebook using gradient descent, but subsequent works like SoundStream (below) switch to EMA (exponential moving average) updates for improved stability and don’t rely on gradient flow through discrete assignments which can be noisy.
+    - **Gumbel-Softmax vs K-means approaches to quantization:** <https://chatgpt.com/share/68a39c2c-db50-8005-b153-150bc2eaa58f>
   - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in R^d$ by a single codebook entry $e_i \in R^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in R^{G
   \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
-- **Conceptual Jumps:**
+- **Conceptual Jumps:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   - **wav2vec -> vq-wav2vec:** Add discretization, make speech look like language tokens, apply BERT-style masked LM.
 
@@ -93,13 +95,13 @@
   - Instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly (with the whole network being trained e2e).
   - Downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
   - On Librispeech, outperforms previous SoTA with 100x less labeled data.
-- **Model:**
+- **Model:** (Fig 1)
   - **(1) Encoder network (temporal conv, $f \colon X \to Z$):** Takes raw audio $X$ and outputs latent representation $Z$.
   - **(2) Context network (masked transformer, $g \colon Z \to C$):** Takes latent representation $Z$ with spans masked randomly, and outputs context embedding $C$.
     - The **inputs to the context network are continuous latent embeddings, with the quantized latents only used as targets in the contrastive loss**. This is different from vq-wav2vec where the context network takes quantized latent reconstructions as inputs.
     - Ablations over four combinations (inputs_to_tranformer={continuous,quantized} x contrastive_targets={continuous,quantized}) show continuous inputs and quantized targets to have the lowest WER after finetuning on Librispeech.
     - This makes sense, as continuous latent representations retain more information to enable better context representations, and quantizing the target representations leads to more robust training.
-  - (3) **Quantization module ($q \colon Z \to Q$):** Continuous latent representation $Z$ to quantized targets $Q$ for contrastive loss.
+  - **(3) Quantization module ($q \colon Z \to Q$):** Continuous latent representation $Z$ to quantized targets $Q$ for contrastive loss.
     - Gumbel-Softmax approach from vq-wav2vec.
     - Product Quantization (PQ) with $G$ groups. Product  quantization  amounts  to  choosing  quantized  representations  from multiple codebooks and concatenating them.
 - **Objective:** Loss $L = L_{contrastive} + \alpha L_{codebook-diversity}$
@@ -110,14 +112,34 @@
   - **Codebook diversity loss:** $L_{codebook-diversity} = -H(\tilde{p}) / V = \frac{1}{V} \sum_{v=1}^{V} \tilde{p}_v \log \tilde{p}_v$
     - $\tilde{p}_v$ is the softmax probability of choosing codebook entry $v$ (used for Gumbel-Softmax formulation, but softmax computed here without the Gumbel noise and temperature terms), averaged over all utterances in a batch.
     - Encourages equal use of entries in the codebook by maximizing entropy of codebook selection in a batch.
-    - When there are $G$ codebooks due to Product Quantization, averaged over them accordingly.
+    - When there are $G$ codebooks in the Product Quantization scenario, the loss is averaged over them accordingly.
 - **Downstream use - ASR finetuning:**
   - Finetuning for ASR by adding a linear projection on top of the context network, and trained with CTC.
   - Outperforms previous SoTA with 100x less labeled data on Librispeech.
-- **Conceptual Jumps:**
+- **Conceptual Jumps:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   **wav2vec -> vq-wav2vec:** Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
   - **vq-wav2vec -> wav2vec 2.0:** Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
+
+## [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units
+
+**Date:** 2025-08-17
+**Arxiv:** <https://arxiv.org/abs/2106.07447>
+**Paperpile:** <https://app.paperpile.com/view/?id=b5855f1a-4cd9-41a8-b651-ae0db12fbd14>
+
+- **Intro:**
+  - HuBERT (Hidden Unit BERT): wav2vec 2.0 style SSL pretraining for speech, but rather than having the targets for contrastive loss come from within the model (in the form of quantized latent representations), HuBERT performs **offline clustering of MFCC features uses the cluster IDs as targets for masked spans**.
+  - > Speech  signals  differ  from  text  and  images  in  that  they are continuous-valued sequences. Self-supervised learning for the  speech  recognition  domain  faces  unique  challenges  from those in CV and NLP. Firstly, the presence of multiple sounds in  each  input  utterance  breaks  the  instance  classification  as- sumption used in many CV pre-training approaches. Secondly, during pre-training, there is no prior lexicon of discrete sound units available, as in NLP applications in which words or word pieces are used, hindering the use of predictive losses. Lastly, the  boundaries  between  sound  units  are  not  known,  which complicates masked prediction pre-training.
+- **Method:**
+  - **Model:** Same as wav2vec 2.0, but there's no quantization module $q$, and instead the targets are clustered offline from MFCC features.
+  - **Loss:** Same loss as wav2vec 2.0 - softmax cross-entropy over cosine similarity between the model's output embeddings and the target cluster embedding corresponding to the masked spans. Optionally also has an additional term for the unmasked spans.
+  - **Extension - Cluster ensembles:** Can extend this trivially to cluster ensembles. Example, an ensemble of k-means models with different codebook sizes can create targets of different granularity and help learn richer representations. Loss is then summed over the ensembles.
+  - **Extension - Iterative refinement of cluster targets:** Another  direction for improved representation is refining the cluster assignments for target prediction throughout the learning process. Example: start the training process with cluster targets as k-means over MFCC features, but progressively change it up to predict clusters computed over learned latent representations of the model being trained.
+- **Conceptual Jumps:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
+  - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+  **wav2vec -> vq-wav2vec:** Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
+  - **vq-wav2vec -> wav2vec 2.0:** Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
+  - **wav2vec 2.0 -> HuBERT:** Conceptually a "step back" from wav2vec 2.0 in terms of being fully end-to-end. wav2vec 2.0 is farther right on the self-supervision axis as the targets for contrastive loss are also generated by the model itself (via its quantizaton module). On the other hand, HuBERT takes a more "conservative" approach by generating offline targets via k-means clustering of MFCC features to favor more stable learning. HuBERT does update its targets during the course of training by clustering intermediate layer features, but this is done much more infrequently (whereas wav2vec 2.0 can be seen as updating its targets after every gradient update step).
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
