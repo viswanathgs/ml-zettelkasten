@@ -1,27 +1,14 @@
 # Interspeech 2023
 
-**Created:** 2023-08
+- **Created**: 2023-08-20
+- **Last Updated**: 2023-08-24
+- **Status**: `Done`
 
-## People
-
-- [X] Paola Garcia, JHU: <https://www.clsp.jhu.edu/faculty/paola-garcia/>
-  - Diarization, children's speech
-  - Also involved in icefall/lhotse/k2 at a high-level
-- [X] Reinhold Haeb-Umbach, Paderborn University: <https://www.uni-paderborn.de/person/242>
-  - Works mainly on "front-end", like source separation
-  - Focused currently on multi-talker separation in meetings
-- [X] Marc Delcroix, NTT: <https://scholar.google.com/citations?user=QG8aWfIAAAAJ&hl=en>
-- [X] Shinji Watanabe, CMU: <https://www.ece.cmu.edu/directory/bios/Shinji%20Watanabe.html>
-  - Was super aware of Meta's stuff including the recent CTRL<>speech reorg
-- [X] Scott Wisdom, Google: <https://stwisdom.github.io/>
-  - Works closely with Ron Weiss, mostly on audio stuff
-- Sanjeev Khudanpur, JHU: <https://www.clsp.jhu.edu/faculty/sanjeev-khudanpur/>
-
-## Papers of note
+## Papers
 
 ### [Delay-penalized CTC implemented based on Finite State Transducer](https://arxiv.org/abs/2305.11539)
 
-**Tags:** latency, WFST
+**Tags**: latency, WFST
 
 - The same idea as fast-emit/fast-elastic style regularization by identifying the first non-blank in a repeated sequence and adding a regualization term.
 - But implemented as an FST instead by adding a new state that identifies the first non-blank.
@@ -33,7 +20,7 @@
 
 ### [Enhancing the Unified Streaming and Non-streaming Model with Contrastive Learning](https://arxiv.org/abs/2306.00755)
 
-**Tags:** knowledge distillation, pseudo-labeling
+**Tags**: knowledge distillation, pseudo-labeling
 
 - Broadly, worth digging into the idea of unified streaming and non-streaming models as a way of knowledge distillation
 - Separate streaming and non-streaming encoders, each with its own CTC loss, but contrastive loss to bridge representations. Also followed by an AED (Attention Encoder Decoder) component?
@@ -43,7 +30,7 @@
 
 ### [ZeroPrompt: Streaming Acoustic Encoders are Zero-Shot Masked LMs](https://arxiv.org/abs/2305.10649)
 
-**Tags:** latency, implicit LM
+**Tags**: latency, implicit LM
 
 - There's some latency optimization stuff here by adding zero-padding to the end of each chunk/segment to force it to emit early somehow, but tricks to counterat accuracy loss, but all without needing to retrain the model. How?
 - Some connections to masked LM training, and there appears to be a risk that this would worsen the implicit LM
@@ -51,7 +38,7 @@
 
 ### [Improved Training for End-to-End Streaming Automatic Speech Recognition Model with Punctuation](https://arxiv.org/abs/2306.01296)
 
-**Tags:** prompt-concatenation, implicit spaces
+**Tags**: prompt-concatenation, implicit spaces
 
 - "The acoustic model trained with long sequences by concatenating the input and target sequences can learn punctuation marks attached to the end of sentences more effectively"
   - Clear parallels with prompt-concatenation and implicit spacing (except that the focus in the paper is implicit punctuation)
@@ -64,7 +51,7 @@
 
 ### [2-bit Conformer quantization for automatic speech recognition](https://arxiv.org/abs/2305.16619)
 
-**Tags:** quantization, conformer
+**Tags**: quantization, conformer
 
 - A Google paper that productionizes a 2-bit quantized conformer model for ASR.
 - While this is a bit far-fetched for us, some of the tricks here such as sub-channel quantization are worth reading up on.
@@ -73,7 +60,7 @@
 
 ### [Knowledge Distillation from Non-streaming to Streaming ASR Encoder using Auxiliary Non-streaming Layer](https://www.isca-speech.org/archive/interspeech_2023/shim23_interspeech.html)
 
-**Tags:** knowledge distillation
+**Tags**: knowledge distillation
 
 - Relates to the other paper about distilling from a non-streaming / full-context model to a streaming model, but done so without unified training
 - Primarily aims to address two challenges of KD
@@ -84,7 +71,7 @@
 
 ### [Improving RNN-Transducers with Acoustic LookAhead](https://arxiv.org/abs/2307.05006)
 
-**Tags:** RNN-T, implicit LM
+**Tags**: RNN-T, implicit LM
 
 - Aims to counter the "hallucination" problem of RNN-T owing to its tight coupling with an LM, i.e., the model predictions overly leaning on the prediction network ignoring the input signal when the acoustic model has low confidence.
 - They basically "lookahead" into the acoustic model by zeroing-out the output of the prediction network (text-encoder in the poster image).
@@ -94,7 +81,7 @@
 
 ### [4D ASR: Joint modeling of CTC, Attention, Transducer, and Mask-Predict decoders](https://arxiv.org/abs/2212.10818)
 
-**Tags:** CTC, RNN-T, decoder
+**Tags**: CTC, RNN-T, decoder
 
 - From Shinji Watanabe's group at CMU.
 - Far-fetched for us, but the algorithm/implementation surrounding the fused decoder could make an interesting read.
@@ -103,7 +90,7 @@
 
 ### [Blank-regularized CTC for Frame Skipping in Neural Transducer](https://arxiv.org/abs/2305.11558)
 
-**Tags:** CTC, WFST
+**Tags**: CTC, WFST
 
 - Problem: Every non-blank output by the acoustic model adds work to the expensive decoder computations that occur downstream in ASR.
 - Solution: Making the model not output a bunch of repeats but emit more blanks can save training and inference cost by needing to run the decoder less.
@@ -115,7 +102,7 @@
 
 ### [Regarding Topology and Variant Frame Rates for Differentiable WFST-based End-to-End ASR](https://www.research.ed.ac.uk/en/publications/regarding-topology-and-variant-frame-rates-for-differentiable-wfs)
 
-**Tags:** CTC, WFST
+**Tags**: CTC, WFST
 
 - Another paper similar to the previous one exploring variants in CTC's WFST topologies and looking into how this affects properties like output frame-rates, number of possible alignments, etc.
 - Funnily, overheard the author complaining about the difficulty of getting differentiable WFST papers get accepted: "Reviewers ask why do you want to make WFST differentiable. Well, ask Dan Povey".
@@ -124,4 +111,13 @@
 
 ### [DCTX-Conformer: Dynamic context carry-over for low latency unified streaming and non-streaming Conformer](https://arxiv.org/abs/2306.08175)
 
-**Tags:** left-context, conformer
+**Tags**: left-context, conformer
+
+## People
+
+- [X] Paola Garcia, JHU: <https://www.clsp.jhu.edu/faculty/paola-garcia/>
+- [X] Reinhold Haeb-Umbach, Paderborn University: <https://www.uni-paderborn.de/person/242>
+- [X] Marc Delcroix, NTT: <https://scholar.google.com/citations?user=QG8aWfIAAAAJ&hl=en>
+- [X] Shinji Watanabe, CMU: <https://www.ece.cmu.edu/directory/bios/Shinji%20Watanabe.html>
+- [X] Scott Wisdom, Google: <https://stwisdom.github.io/>
+- Sanjeev Khudanpur, JHU: <https://www.clsp.jhu.edu/faculty/sanjeev-khudanpur/>

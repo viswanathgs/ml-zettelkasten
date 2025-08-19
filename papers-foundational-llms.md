@@ -1,6 +1,10 @@
-# Foundational LLM Papers
+# Foundational LLMs
 
-**Created:** 2025-01-04
+- **Created**: 2025-01-04
+- **Last Updated**: 2025-01-06
+- **Status**: `Paused`
+
+---
 
 - [X] [2022] OPT: Open Pre-trained Transformer Language Models. <https://arxiv.org/abs/2205.01068>
 - [X] [2022] LLaMa: Open and Efficient Foundation Language Models. <https://arxiv.org/abs/2302.13971>
@@ -12,18 +16,22 @@
 
 ## [2022] OPT: Open Pre-trained Transformer Language Models
 
-**Date:** 2025-01-04
-**Arxiv:** <https://arxiv.org/abs/2205.01068>
-**Paperpile:** <https://app.paperpile.com/view/?id=4eefc94a-525e-4e84-88b4-2e80d7c04a56>
+- **Date**: 2025-01-04
+- **Arxiv**: <https://arxiv.org/abs/2205.01068>
+- **Paperpile**: <https://app.paperpile.com/view/?id=4eefc94a-525e-4e84-88b4-2e80d7c04a56>
+
+---
 
 - Mainly replicating GPT3
 - Fully Sharded Data Parallel (FSDP)
 
 ## [2022] Llama: Open and Efficient Foundation Language Models
 
-**Date:** 2025-01-04
-**Arxiv:** <https://arxiv.org/abs/2302.13971>
-**Paperpile:** <https://app.paperpile.com/view/?id=152b9407-9eca-4b65-8d4f-c753723826c9>
+- **Date**: 2025-01-04
+- **Arxiv**: <https://arxiv.org/abs/2302.13971>
+- **Paperpile**: <https://app.paperpile.com/view/?id=152b9407-9eca-4b65-8d4f-c753723826c9>
+
+---
 
 - Compared to GPT3, OPT, etc., smaller models trained on more tokens
 - Pretraining data:
@@ -43,9 +51,11 @@
 
 ## [2023] Llama 2: Open Foundation and Fine-Tuned Chat Models
 
-**Date:** 2025-01-06
-**Arxiv:** <https://arxiv.org/abs/2307.09288>
-**Paperpile:** <https://app.paperpile.com/view/?id=726a7eed-b9ac-4380-a737-ab1a17ed0b56>
+- **Date**: 2025-01-06
+- **Arxiv**: <https://arxiv.org/abs/2307.09288>
+- **Paperpile**: <https://app.paperpile.com/view/?id=726a7eed-b9ac-4380-a737-ab1a17ed0b56>
+
+---
 
 - 1. Overview
   - Llama2 (pretrained): Differences from llama1

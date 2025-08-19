@@ -1,6 +1,10 @@
-# Distributed Optimization Papers
+# Distributed Optimization
 
-**Created**: 2025-07-06
+- **Created**: 2025-07-06
+- **Last Updated**: 2025-07-06
+- **Status**: `Paused`
+
+---
 
 - [ ] Historical papers: google async, baidu, hogwild
 - [ ] <https://arxiv.org/abs/2110.08133>
@@ -33,9 +37,11 @@
 
 ## [2023] Diloco: Distributed low-communication training of language models
 
-**Date:** 2025-07-06
-**Arxiv:** <https://arxiv.org/abs/2311.08105>
-**Paperpile:** <https://app.paperpile.com/view/?id=40f86e2b-3728-415b-8d66-a35bc35a60dc>
+- **Date**: 2025-07-06
+- **Arxiv**: <https://arxiv.org/abs/2311.08105>
+- **Paperpile**: <https://app.paperpile.com/view/?id=40f86e2b-3728-415b-8d66-a35bc35a60dc>
+
+---
 
 - Abstract/Intro
   - Fully sync SGD on ultra-large clusters is insanely challenging infrastructurally: a single rank failing can halt training or lead to numerical issues, poorly leverages heterogenous devices. Difficult to colocate and tightly synchronize a large number of accelerators.
@@ -58,6 +64,10 @@
 
 ## [2024] Asynchronous Local-SGD Training for Language Modeling
 
-**Date:** 2025-07-06
-**Arxiv:** <https://arxiv.org/abs/2401.09135>
-**Paperpile:** <https://app.paperpile.com/view/?id=5809d175-43b1-4788-8bed-6666abaa7688>
+- **Date**: 2025-07-06
+- **Arxiv**: <https://arxiv.org/abs/2401.09135>
+- **Paperpile**: <https://app.paperpile.com/view/?id=5809d175-43b1-4788-8bed-6666abaa7688>
+
+---
+
+- TODO

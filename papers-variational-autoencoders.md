@@ -1,6 +1,10 @@
-# Variational Autoencoder Papers
+# Variational Autoencoders (VAE)
 
-**Created:** 2025-08-08
+- **Created**: 2025-08-08
+- **Last Updated**: 2025-08-08
+- **Status**: `Not Started`
+
+---
 
 - [ ] TODO
 - [ ] [2016] Tutorial on Variational Autoencoders. <https://arxiv.org/abs/1606.05908>

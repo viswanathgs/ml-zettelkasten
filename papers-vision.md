@@ -1,6 +1,10 @@
-# Vision Papers
+# Vision
 
-**Created:** 2025-07-21
+- **Created**: 2025-07-21
+- **Last Updated**: 2025-07-21
+- **Status**: `Paused`
+
+---
 
 - [X] [2021] CLIP: Learning Transferable Visual Models From Natural Language Supervision. <https://arxiv.org/abs/2103.00020>
 - [ ] [2022] OpenCLIP: Reproducible scaling laws for contrastive language-image learning. <https://arxiv.org/abs/2212.07143>
@@ -15,11 +19,13 @@
 
 ## [2021] CLIP: Learning Transferable Visual Models From Natural Language Supervision
 
-**Date:** 2025-07-21
-**Arxiv:** <https://arxiv.org/abs/2103.00020>
-**Paperpile:** <https://app.paperpile.com/view/?id=9ca94ee0-8932-434a-8c28-5d67ba36741d>
-**Assistant:** <https://chatgpt.com/share/687ea62a-ad50-8005-8e98-9defc0dc34bc>
-**CLIP Loss Implementation:** <https://colab.research.google.com/drive/1YqGGDPXh6fyAmdJXyb3163c698DOVze2?usp=sharing>
+- **Date**: 2025-07-21
+- **Arxiv**: <https://arxiv.org/abs/2103.00020>
+- **Paperpile**: <https://app.paperpile.com/view/?id=9ca94ee0-8932-434a-8c28-5d67ba36741d>
+- **Assistant**: <https://chatgpt.com/share/687ea62a-ad50-8005-8e98-9defc0dc34bc>
+- **CLIP Loss Implementation**: <https://colab.research.google.com/drive/1YqGGDPXh6fyAmdJXyb3163c698DOVze2?usp=sharing>
+
+---
 
 - (1) Intro
   - Motivation
@@ -54,9 +60,11 @@
 
 ## [2023] MetaCLIP: Demystifying CLIP Data
 
-**Date:** 2025-07-23
-**Arxiv:** <https://arxiv.org/abs/2309.16671>
-**Paperpile:** <https://app.paperpile.com/view/?id=5df5730f-947e-4a5b-b3f1-dad04a0687ec>
+- **Date**: 2025-07-23
+- **Arxiv**: <https://arxiv.org/abs/2309.16671>
+- **Paperpile**: <https://app.paperpile.com/view/?id=5df5730f-947e-4a5b-b3f1-dad04a0687ec>
+
+---
 
 - "We believe that the main ingredient to the success of CLIP is its data and not the model architecture or pre-training objective."
 - MetaCLIP (Metadata-Curated Language-Image Pretraining) aims to reveal CLIP's data curation process.

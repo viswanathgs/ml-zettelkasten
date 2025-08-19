@@ -1,6 +1,10 @@
-# Neuroscience Papers
+# Neuroscience
 
-**Created:** 2025-03-28
+- **Created**: 2025-03-28
+- **Last Updated**: 2025-03-28
+- **Status**: `Not Started`
+
+---
 
 - [ ] <https://www.biorxiv.org/content/10.1101/055624v1>
 - [ ] <https://arxiv.org/abs/1911.09451>

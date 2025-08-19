@@ -1,7 +1,10 @@
 # Python nogil
 
-**Created:** 2023-07-30
-**Last Updated:** 2023-07-30
+- **Created**: 2023-07-30
+- **Last Updated**: 2023-07-30
+- **Status**: `Not Started`
+
+---
 
 - [ ] [LWN article](https://lwn.net/Articles/872869)
 - [ ] [Sam's EuroPython 2022 talk](https://www.youtube.com/watch?v=9OOJcTp8dqE)

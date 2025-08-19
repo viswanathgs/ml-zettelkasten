@@ -1,6 +1,10 @@
-# ML Fundamental Papers
+# ML Fundamentals
 
-**Created:** 2025-01-04
+- **Created**: 2025-01-04
+- **Last Updated**: 2025-07-31
+- **Status**: `In Progress`
+
+---
 
 - [ ] [2014] Bahdanau, Neural machine translation by jointly learning to align and translate
 - [ ] [2015] Attention-Based Models for Speech Recognition. <https://arxiv.org/abs/1506.07503>
@@ -33,10 +37,12 @@
 
 ## [2016] Neural Machine Translation of Rare Words with Subword Units
 
-**Date:** 2025-03-26
-**Arxiv:** <https://arxiv.org/abs/1508.07909>
-**Paperpile:** <https://app.paperpile.com/view/?id=c465c277-f3b0-4c79-b05c-a66dcc4dea35>
-**Code:** <https://github.com/rsennrich/subword-nmt>
+- **Date**: 2025-03-26
+- **Arxiv**: <https://arxiv.org/abs/1508.07909>
+- **Paperpile**: <https://app.paperpile.com/view/?id=c465c277-f3b0-4c79-b05c-a66dcc4dea35>
+- **Code**: <https://github.com/rsennrich/subword-nmt>
+
+---
 
 - Neural Machine Translation (NMT) is an open vocabulary problem. Previously, fixed word-level vocabulary was used with back-off to dictionary lookup for out-of-vocabulary (OOV) words. This doesn't work well, often not scalable (eg., compound words in Deutsch), isn't fully learned/e2e due to dictionary fallback, etc.
 - Goal: Open-vocabulary NMT without dictionary back-off. Solution: Subword units.
@@ -62,9 +68,11 @@
 
 ## [2021] RASP: Thinking Like Transformers
 
-**Date:** 2025-01-28
-**Arxiv:** <https://arxiv.org/abs/2106.06981>
-**Paperpile:** <https://app.paperpile.com/view/?id=6e497a3e-fba3-4796-8f08-56786390797b>
+- **Date**: 2025-01-28
+- **Arxiv**: <https://arxiv.org/abs/2106.06981>
+- **Paperpile**: <https://app.paperpile.com/view/?id=6e497a3e-fba3-4796-8f08-56786390797b>
+
+---
 
 - RNNs have a parallel in finite state automata, what is the equivalent for transformer?
 - RASP Language: Restricted Access Sequence Processing Language
@@ -82,10 +90,12 @@
 
 ## [2021] LoRA: Low-Rank Adaptation of Large Language Models
 
-**Date:** 2025-03-03
-**Arxiv:** <https://arxiv.org/abs/2106.09685>
-**Paperpile:** <https://app.paperpile.com/view/?id=a1e6be67-62b8-41df-a1c3-10e62df070af>
-**Code:** <https://github.com/microsoft/LoRA>
+- **Date**: 2025-03-03
+- **Arxiv**: <https://arxiv.org/abs/2106.09685>
+- **Paperpile**: <https://app.paperpile.com/view/?id=a1e6be67-62b8-41df-a1c3-10e62df070af>
+- **Code**: <https://github.com/microsoft/LoRA>
+
+---
 
 - Abstract
   - Naive finetuning of a pretrained transformer is expensive.
@@ -112,9 +122,11 @@
 
 ## [2020] RAG: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks
 
-**Date:** 2025-07-07
-**Arxiv:** <https://arxiv.org/abs/2005.11401>
-**Paperpile:** <https://app.paperpile.com/view/?id=f89e65a4-6bb1-4d08-a3db-dc84384d5cd6>
+- **Date**: 2025-07-07
+- **Arxiv**: <https://arxiv.org/abs/2005.11401>
+- **Paperpile**: <https://app.paperpile.com/view/?id=f89e65a4-6bb1-4d08-a3db-dc84384d5cd6>
+
+---
 
 - End-to-end differentiable retriever and generator. Retriever encodes query $x$ and uses maximum inner product search (MIPS) to select top-K documents $z_i$. The generator uses the original query $x$, retrieved document latent variable $z$, and previously generated tokens to generate the next token.
 - Two methods:
@@ -128,9 +140,11 @@
 
 ## [2020] REALM: Retrieval-Augmented Language Model Pre-Training
 
-**Date:** 2025-07-31
-**Arxiv:** <https://arxiv.org/abs/2002.08909>
-**Paperpile:** <https://app.paperpile.com/view/?id=438b99d9-7110-4170-8ab8-911a99e9b9ee>
+- **Date**: 2025-07-31
+- **Arxiv**: <https://arxiv.org/abs/2002.08909>
+- **Paperpile**: <https://app.paperpile.com/view/?id=438b99d9-7110-4170-8ab8-911a99e9b9ee>
+
+---
 
 - Same vein as RAG, but see differences here: <https://chatgpt.com/share/688ce137-6e80-8005-9945-9d3d5df68202>. The main thing with REALM is that retrieval is part of the pretraining objective, not just during downstream fine-tuning or inference.
 - > The key intuition of REALM is to train the retriever us- ing a performance-based signal from unsupervised text: a retrieval that improves the language model’s perplex- ity is helpful and should be rewarded, while an un- informative retrieval should be penalized.   For exam- ple, in Figure 1, if the model needs to fill the blank in “the at the top of the pyramid”, the re- triever should be rewarded for selecting a document con- taining “The pyramidion on top allows for less material higher up the pyramid”. We achieve this behavior by modeling our retrieve-then-predict approach as a latent variable language model and optimizing the marginal likelihood.
@@ -140,9 +154,11 @@
 
 ## [2017] Faiss: Billion-scale similarity search with GPUs
 
-**Date:** 2025-07-08
-**Arxiv:** <https://arxiv.org/abs/1702.08734>
-**Paperpile:** <https://app.paperpile.com/view/?id=88cdd2ad-c73e-4072-93b5-7478cb2f3076>
+- **Date**: 2025-07-08
+- **Arxiv**: <https://arxiv.org/abs/1702.08734>
+- **Paperpile**: <https://app.paperpile.com/view/?id=88cdd2ad-c73e-4072-93b5-7478cb2f3076>
+
+---
 
 - k-NN embedding search on large databases.
   - Insight: "accepting a minimal accuracy loss results in orders of magnitude of compression"

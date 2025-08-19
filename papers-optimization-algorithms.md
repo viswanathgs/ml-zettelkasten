@@ -1,6 +1,8 @@
-# SGD Optimization Algorithms
+# Optimization Algorithms
 
-**Date:** 2022-04
+- **Created**: 2022-04
+- **Last Updated**: 2022-04
+- **Status**: `Paused`
 
 ## Fundamentals
 

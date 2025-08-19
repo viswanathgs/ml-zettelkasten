@@ -1,7 +1,14 @@
 # Reinforcement Learning
 
-**Created:** 2019-04
-**Last Updated:** 2023-11
+- **Created**: 2019-04
+- **Last Updated**: 2023-11
+- **Status**: `Paused`
+
+---
+
+- [ ] TODO
+
+## Archive
 
 1. Beginner's introduction to RL and Deep Q-Learning (DQN): <https://www.intel.ai/demystifying-deep-reinforcement-learning/#gs.ac37fu>
 2. Fundamentals of Policy Gradients (forms the basis of IMPALA): <http://karpathy.github.io/2016/05/31/rl>

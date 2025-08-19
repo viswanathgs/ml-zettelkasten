@@ -1,6 +1,10 @@
 # Mixed Precision Training
 
-**Created:** 2023-05
+- **Created**: 2023-05
+- **Last Updated**: 2023-05
+- **Status**: `Done`
+
+---
 
 - [X] Original Paper: [Mixed Precision Training, Paulius](https://arxiv.org/abs/1710.03740)
 - [X] <https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html>
