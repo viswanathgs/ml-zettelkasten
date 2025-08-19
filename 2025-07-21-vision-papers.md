@@ -1,7 +1,6 @@
 # Vision Papers
 
-**Start:** 2025-07-21
-**End:** TODO
+**Created:** 2025-07-21
 
 - [X] [2021] CLIP: Learning Transferable Visual Models From Natural Language Supervision. <https://arxiv.org/abs/2103.00020>
 - [ ] [2022] OpenCLIP: Reproducible scaling laws for contrastive language-image learning. <https://arxiv.org/abs/2212.07143>

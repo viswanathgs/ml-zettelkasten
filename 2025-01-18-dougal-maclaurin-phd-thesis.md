@@ -1,7 +1,6 @@
 # Dougal MacLaurin's PhD Thesis
 
-**Start:** 2024-01-18
-**End:** TODO
+**Created:** 2024-01-18
 
 [Modeling, Inference and Optimization with Composable Differentiable Procedures](https://dougalmaclaurin.com/phd-thesis.pdf)
 

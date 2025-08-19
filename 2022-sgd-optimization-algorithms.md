@@ -1,5 +1,7 @@
 # SGD Optimization Algorithms
 
+**Date:** 2022-04
+
 ## Fundamentals
 
 - [ ] Blog: [Overview of various SGD optimization algorithms](https://ruder.io/optimizing-gradient-descent/)

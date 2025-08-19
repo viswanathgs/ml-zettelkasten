@@ -1,7 +1,6 @@
 # Distributed Optimization Papers
 
-**Start**: 2025-07-06
-**End:** TODO
+**Created**: 2025-07-06
 
 - [ ] Historical papers: google async, baidu, hogwild
 - [ ] <https://arxiv.org/abs/2110.08133>

@@ -1,7 +1,6 @@
 # Book - Neural Networks and Deep Learning, Michael Nielsen
 
-**Start:** 2024-12-29
-**End:** 2025-01-17
+**Created:** 2024-12-29
 
 <https://neuralnetworksanddeeplearning.com/>
 

@@ -1,7 +1,6 @@
 # Convex Optimization, Stephen Boyd
 
-**Start:** 2025-08-03
-**End:** TODO
+**Created:** 2025-08-03
 
 **Book, Stephen Boyd:** <https://stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf>
 **Lecture Slides, Stephen Boyd:** <https://stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf>

@@ -1,7 +1,6 @@
 # Neuroscience Papers
 
-**Start:** 2025-03-28
-**End:** TODO
+**Created:** 2025-03-28
 
 - [ ] <https://www.biorxiv.org/content/10.1101/055624v1>
 - [ ] <https://arxiv.org/abs/1911.09451>

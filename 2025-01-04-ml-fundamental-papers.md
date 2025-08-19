@@ -1,7 +1,6 @@
 # ML Fundamental Papers
 
-**Start:** 2025-01-04
-**End:** TODO
+**Created:** 2025-01-04
 
 - [ ] [2014] Bahdanau, Neural machine translation by jointly learning to align and translate
 - [ ] [2015] Attention-Based Models for Speech Recognition. <https://arxiv.org/abs/1506.07503>

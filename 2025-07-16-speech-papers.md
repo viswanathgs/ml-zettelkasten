@@ -1,7 +1,6 @@
 # Speech/Audio Papers
 
-**Start:** 2025-07-16  
-**End:** TODO  
+**Created:** 2025-07-16  
 
 - [X] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
 - [ ] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
@@ -80,7 +79,7 @@
     - **Gumbel-Softmax vs K-means approaches to quantization:** <https://chatgpt.com/share/68a39c2c-db50-8005-b153-150bc2eaa58f>
   - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in R^d$ by a single codebook entry $e_i \in R^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in R^{G
   \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
-- **Conceptual Jumps:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
+- **Lineage:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   - **wav2vec -> vq-wav2vec:** Add discretization, make speech look like language tokens, apply BERT-style masked LM.
 
@@ -116,7 +115,7 @@
 - **Downstream use - ASR finetuning:**
   - Finetuning for ASR by adding a linear projection on top of the context network, and trained with CTC.
   - Outperforms previous SoTA with 100x less labeled data on Librispeech.
-- **Conceptual Jumps:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
+- **Lineage:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   **wav2vec -> vq-wav2vec:** Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
   - **vq-wav2vec -> wav2vec 2.0:** Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
@@ -135,7 +134,7 @@
   - **Loss:** Same loss as wav2vec 2.0 - softmax cross-entropy over cosine similarity between the model's output embeddings and the target cluster embedding corresponding to the masked spans. Optionally also has an additional term for the unmasked spans.
   - **Extension - Cluster ensembles:** Can extend this trivially to cluster ensembles. Example, an ensemble of k-means models with different codebook sizes can create targets of different granularity and help learn richer representations. Loss is then summed over the ensembles.
   - **Extension - Iterative refinement of cluster targets:** Another  direction for improved representation is refining the cluster assignments for target prediction throughout the learning process. Example: start the training process with cluster targets as k-means over MFCC features, but progressively change it up to predict clusters computed over learned latent representations of the model being trained.
-- **Conceptual Jumps:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
+- **Lineage:** <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec:** Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   **wav2vec -> vq-wav2vec:** Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
   - **vq-wav2vec -> wav2vec 2.0:** Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
@@ -192,6 +191,14 @@
     - During training, when denoise is False, the input and target audio are the same. When denoise is True, the target is the cleaner/enhanced version of the input audio.
     - When the input itself is clean, the model is trained with input = target and denoise being both True and False. This is done to prevent SoundStream from adversely affecting clean audio when denoising is enabled.
 
+## [2023] SoundStorm: Efficient Parallel Audio Generation
+
+**Date:** 2025-08-19
+**Arxiv:** <https://arxiv.org/abs/2305.09636>
+**Paperpile:** <https://app.paperpile.com/view/?id=b6a32e14-6a86-4bce-bfed-888e152d13c4>
+
+- TODO
+
 ## [2023] AudioLM: a Language Modeling Approach to Audio Generation
 
 **Date:** 2025-08-10
@@ -200,7 +207,7 @@
 
 - **Intro:**
   - > We  introduce  AudioLM,  a  framework  for  high- quality audio generation with long-term consistency. AudioLM maps the input audio to a sequence of discrete tokens and casts au- dio generation as a language modeling task in this representation space. We show how existing audio tokenizers provide different trade-offs between reconstruction quality and long-term structure, and  we  propose  a  hybrid  tokenization  scheme  to  achieve  both objectives. Namely, we leverage the discretized activations of a masked language model pre-trained on audio to capture long-term structure and the discrete codes produced by a neural audio codec to achieve high-quality synthesis. By training on large corpora of raw audio waveforms, AudioLM learns to generate natural and co- herent continuations given short prompts. When trained on speech, and  without  any  transcript  or  annotation,  AudioLM  generates syntactically and semantically plausible speech continuations while also maintaining speaker identity and prosody for unseen speakers. Furthermore, we demonstrate how our approach extends beyond speech by generating coherent piano music continuations, despite being  trained  without  any  symbolic  representation  of  music.
-  - Achieves the objective of both high-quality audio generation as well as long-term coherent structure. Combines advances in neural audio compression (SoundStream), self-supervised speech pretraining (w2v-bert), and language modeling. Essentially, training a language model to generate both semantic and acoustic tokens simultaenously leads to high audio quality and long-term consistency.
+  - Achieves the objective of both high-quality audio generation as well as long-term coherent structure. Combines advances in neural audio compression (SoundStream), self-supervised speech pretraining (wav2vec 2.0, HuBERT, w2v-bert, etc), and language modeling. Essentially, training a language model to generate both semantic and acoustic tokens simultaenously leads to high audio quality and long-term consistency.
     - **Semantic tokens (coarse):** constructed from a model pretrained with a self-supervised masked language modeling objective.
     - **Acoustic tokens (finer):** produced by SoundStream neural codec.
 - **Three components of the model:**
@@ -225,10 +232,11 @@
   - **Inference:**
     - Target application: Given an audio prompt $x$, generate continuations that maintain both semantic and acoustic coherence.
     - Steps:
-      - **Semantic token generation:** First obtain semantic tokens corresponding to the prompt $x$ from w2v-BERT encoder and feed those into the transformer language model to generate semantic token completions.
-      - **Coarse acoustic token generation:** Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the corase acoustic token completions.
-      - **Fine acoustic token generation:** Concatenate the entire coarse acoustic token sequence (corresponding to the prompt as well as those generated above) along with the fine acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the fine acoustic model to generate the fine acoustic token completions.
-      - **SoundStream decoder for audio generation:** Finally, feed all the acoustic tokens to the SoundStream decoder to reconstruct the audio waveform output $\hat{x}$.
+      - **Step 1 (Semantic token generation):** First obtain semantic tokens corresponding to the prompt $x$ from w2v-BERT encoder and feed those into the transformer language model to generate semantic token completions.
+      - **Step 2 (Coarse acoustic token generation):** Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the corase acoustic token completions.
+      - **Step 3 (Fine acoustic token generation):** Concatenate the entire coarse acoustic token sequence (corresponding to the prompt as well as those generated above) along with the fine acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the fine acoustic model to generate the fine acoustic token completions.
+      - **Step 4 (SoundStream decoder for audio generation):** Finally, feed all the acoustic tokens to the SoundStream decoder to reconstruct the audio waveform output $\hat{x}$.
+- **Lineage:** <https://chatgpt.com/share/68a496b4-6e40-8005-813f-707298b27f4e>
 
 ## [2023] AudioPaLM: A Large Language Model That Can Speak and Listen
 

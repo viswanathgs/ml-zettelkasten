@@ -1,7 +1,6 @@
 # Variational Autoencoder Papers
 
-**Start:** 2025-08-08
-**End:** TODO
+**Created:** 2025-08-08
 
 - [ ] TODO
 - [ ] [2016] Tutorial on Variational Autoencoders. <https://arxiv.org/abs/1606.05908>

@@ -1,7 +1,6 @@
 # srush Puzzles
 
-**Start:** 2024-12-16
-**End:** 2024-04-13
+**Created:** 2024-12-16
 
 - [X] <https://github.com/viswanathgs/Tensor-Puzzles>. Start: 2024-12-16, End: 2024-12-28.
 - [X] <https://github.com/viswanathgs/Autodiff-Puzzles>. Start: 2024-01-02, End: 2025-04-13.
