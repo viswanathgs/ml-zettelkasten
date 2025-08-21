@@ -72,16 +72,16 @@
   - **(2) BERT on discrete audio tokens**: The discretization step allows a direct drop-in of algorithms from NLP which are built around discrete inputs. BERT encoder is trained on the discretized unlabeled audio tokens.
   - **(3) ASR using BERT representations**: Acoustic models are trained on labeled speech data using BERT representations as inputs instead of log-mel spectrogram features.
 - **Two approaches to Vector Quantization**:
-  - **(a) Gumbel-Softmax**:
+  - **(a) Gumbel-Softmax**: <https://chatgpt.com/share/68a5e923-6d40-8005-adf1-a1ab20a7ad4e>
     - TODO
   - **(b) K-means**: <https://chatgpt.com/share/689f46dc-7978-8005-94d7-285099e82814>
     - Quantization module $q$ is simply replacing $z$ by a $\tilde{z} = e_i$ from the codebook that's closest in terms of L2 distance.
     - Unlike in Gumbel-Softmax, the above codebook lookup step is not differentiable anymore.
-    - **Loss $L_{vq-wav2vec}^{kmeans} = L_{wav2vec} + L_{codebook}$**
+    - **Loss $L_{vq-wav2vec}^{kmeans} = L_{wav2vec} + L_{codebook} + L_{commitment}$**
       - **wav2vec loss**: $L_{wav2vec}$ is the same as wav2vec loss except that the context network predicts the quantized latent $\tilde{Z}$, and straight-through estimator (STE) is used to backprop all the way.
-      - **Codebook/commitment loss**: $L_{codebook} = \Vert z.detach() - \tilde{z} \Vert^2 + \Vert z - \tilde{z}.detach() \Vert^2$.
-        - The first term updates the chosen codebook entry $\tilde{z}$ to be closer to the frozen encoder representation $z$ (frozen due to stop-gradient).
-        - The second term updates the encoder output $z$ towards the chosen (and frozen) codebook vector $\tilde{z}$.
+      - **Codebook and commitment losses**: $L_{codebook} + L_{commitment}= \Vert z.detach() - \tilde{z} \Vert^2 + \Vert z - \tilde{z}.detach() \Vert^2$.
+        - The first term (codebook loss) updates the chosen codebook entry $\tilde{z}$ to be closer to the frozen encoder representation $z$ (frozen due to stop-gradient).
+        - The second term (commitment loss) updates the encoder output $z$ towards the chosen (and frozen) codebook vector $\tilde{z}$, forcing the encoder to "commit" to a codebook entry.
         - This separation is more stable and avoids collapse rather than having a single $\Vert z - \tilde{z} \Vert^2$ term: <https://chatgpt.com/c/689e8361-ac38-8329-91b9-3d958b282100>
     - **Note**: The above loss updates codebook using gradient descent, but subsequent works like SoundStream (below) switch to EMA (exponential moving average) updates for improved stability and don’t rely on gradient flow through discrete assignments which can be noisy.
     - **Gumbel-Softmax vs K-means approaches to quantization**: <https://chatgpt.com/share/68a39c2c-db50-8005-b153-150bc2eaa58f>
