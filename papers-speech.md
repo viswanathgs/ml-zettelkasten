@@ -7,7 +7,7 @@
 ---
 
 - [X] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
-- [ ] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
+- [X] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
 - [X] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. <https://arxiv.org/abs/2006.11477>
 - [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
 - [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
@@ -67,26 +67,37 @@
   - **(1) vq-wav2vec model** (Fig 1):
     - In original wav2vec, we went from raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
     - In vq-wav2vec, we insert a vector quantization module $q$ between $f$ and $g$ such that $f \colon X \to Z$, $q \colon Z \to \tilde{Z}$, and $g \colon \tilde{Z} \to C$. $q$ builds discrete representations and $\tilde{Z}$ is the quantized representation reconstruction.
-    - The quantization module replaces the original representation $z$ by $\tilde{z} = e_i$ from a fixed-size codebook $e \in R^{V × d}$, where $V$ is the codebook size and $d$ is the embedding dim (as in `nn.EmbeddingBag`).
+    - The quantization module replaces the original representation $z$ by $\tilde{z} = e_i$ from a fixed-size codebook $e \in \mathbb{R}^{V \times d}$, where $V$ is the codebook size and $d$ is the embedding dim (as in `nn.Embedding`).
     - Loss: Same as wav2vec, except that the context network output $c_t$ predicts the future quantized latent representations $\tilde{z}_{t+k}$ rather than continous encoder output ${z}_{t+k}$.
   - **(2) BERT on discrete audio tokens**: The discretization step allows a direct drop-in of algorithms from NLP which are built around discrete inputs. BERT encoder is trained on the discretized unlabeled audio tokens.
   - **(3) ASR using BERT representations**: Acoustic models are trained on labeled speech data using BERT representations as inputs instead of log-mel spectrogram features.
 - **Two approaches to Vector Quantization**:
   - **(a) Gumbel-Softmax**: <https://chatgpt.com/share/68a5e923-6d40-8005-adf1-a1ab20a7ad4e>
-    - TODO
+    - Gumbel-Softmax to sample discrete codebook entries in a fully-differentiable manner.
+    - **Training:**
+      - Linear projection added to the dense latent representation $z$ to produce logits $l \in \mathbb{R}^V$ for Gumbel-Softmax to sample from the $V$ codebook entries.
+      - Probability for choosing the $j$-th codebook entry is $p_j = \frac{\exp(l_j + g_j) / \tau}{\sum_{v=1}^V \exp(l_v + g_v) / \tau}$, where $g = -\log(-\log(u))$ is the Gumbel noise, $u \sim U(0,1)$ are uniform samples, and $\tau$ is the temperature parameter to approximate argmax as in Gumbel-max.
+      - The added Gumbel noise helps sample discrete values from the distribution $l$ while making the process differentiable thanks to the reparametrization trick. The temperature parameter $\tau$ helps approximate the non-differentiable argmax op in Gumbel-max.
+      - During forward pass, pick the codebook entry $\tilde{z}$ corresponding to the largest $p$. This non-differentiable step is still needed as we don't want a weighted sum of codebook entries, but strictly want to select a single codebook entry.
+      - During backward pass, the usage of straight-through estimator (STE) enables gradient flow from the chosen $\tilde{z}$ to the distribution $p$. The actual implementation can be formulated as going from $p$ to argmax one-hot, and then applying STE to bypass argmax:
+        - $p_{onehot} = onehot(argmax_j p_j)$
+        - $p_{onehot} = (p_{onehot} - p).detach() + p$
+        - $\tilde{z} = codebook[p_{onehot}]$
+    - **Inference:**
+      - We simply pick the codebook entry corresponding to the largest index in $l$.
+      - No Gumbel-noise is added during inference as we don't have to sample and we don't need gradients.
   - **(b) K-means**: <https://chatgpt.com/share/689f46dc-7978-8005-94d7-285099e82814>
     - Quantization module $q$ is simply replacing $z$ by a $\tilde{z} = e_i$ from the codebook that's closest in terms of L2 distance.
     - Unlike in Gumbel-Softmax, the above codebook lookup step is not differentiable anymore.
     - **Loss $L_{vq-wav2vec}^{kmeans} = L_{wav2vec} + L_{codebook} + L_{commitment}$**
       - **wav2vec loss**: $L_{wav2vec}$ is the same as wav2vec loss except that the context network predicts the quantized latent $\tilde{Z}$, and straight-through estimator (STE) is used to backprop all the way.
-      - **Codebook and commitment losses**: $L_{codebook} + L_{commitment}= \Vert z.detach() - \tilde{z} \Vert^2 + \Vert z - \tilde{z}.detach() \Vert^2$.
+      - **Codebook and commitment losses**: $L_{codebook} + L_{commitment} = \|z.\text{detach}() - \tilde{z}\|^2 + \|z - \tilde{z}.\text{detach}()\|^2$.
         - The first term (codebook loss) updates the chosen codebook entry $\tilde{z}$ to be closer to the frozen encoder representation $z$ (frozen due to stop-gradient).
         - The second term (commitment loss) updates the encoder output $z$ towards the chosen (and frozen) codebook vector $\tilde{z}$, forcing the encoder to "commit" to a codebook entry.
-        - This separation is more stable and avoids collapse rather than having a single $\Vert z - \tilde{z} \Vert^2$ term: <https://chatgpt.com/c/689e8361-ac38-8329-91b9-3d958b282100>
+        - This separation is more stable and avoids collapse rather than having a single $\|z - \tilde{z}\|^2$ term: <https://chatgpt.com/c/689e8361-ac38-8329-91b9-3d958b282100>
     - **Note**: The above loss updates codebook using gradient descent, but subsequent works like SoundStream (below) switch to EMA (exponential moving average) updates for improved stability and don’t rely on gradient flow through discrete assignments which can be noisy.
     - **Gumbel-Softmax vs K-means approaches to quantization**: <https://chatgpt.com/share/68a39c2c-db50-8005-b153-150bc2eaa58f>
-  - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in R^d$ by a single codebook entry $e_i \in R^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in R^{G
-  \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
+  - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in \mathbb{R}^d$ by a single codebook entry $e_i \in \mathbb{R}^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in \mathbb{R}^{G \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
 - **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
   - **wav2vec -> vq-wav2vec**: Add discretization, make speech look like language tokens, apply BERT-style masked LM.
