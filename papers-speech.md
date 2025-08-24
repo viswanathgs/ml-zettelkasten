@@ -48,7 +48,7 @@
     - **ASR models are trained with wav2vec's context representations as inputs instead of using log-mel filterbank features**.
     - Notably, **the pretrained wav2vec model is not used as a checkpoint to finetune from**.
     - wav2vec + ASR aren't trained end-to-end. wav2vec is first trained and frozen, and then its representations are used as inputs to train a CTC-style ASR model.
-  - **ASR Decoding**: Maximize $\log p_{CTC}(Y \mid C) + \alpha \log P_{LM}(Y) + \beta \lvert Y \rvert$, where $p_{LM}$ is a language model and the last term is the insertion bonus.
+  - **ASR Decoding**: Maximize $\log p_{\text{CTC}}(Y \mid C) + \alpha \log P_{\text{LM}}(Y) + \beta |Y|$, where $p_{\text{LM}}$ is a language model and the last term is the insertion bonus.
   - Outperforms the best character-based ASR model at that time (DeepSpeech 2) using two orders of magnitude less labeled training data.
 
 ## [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations
@@ -68,7 +68,7 @@
     - In original wav2vec, we went from raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
     - In vq-wav2vec, we insert a vector quantization module $q$ between $f$ and $g$ such that $f \colon X \to Z$, $q \colon Z \to \tilde{Z}$, and $g \colon \tilde{Z} \to C$. $q$ builds discrete representations and $\tilde{Z}$ is the quantized representation reconstruction.
     - The quantization module replaces the original representation $z$ by $\tilde{z} = e_i$ from a fixed-size codebook $e \in \mathbb{R}^{V \times d}$, where $V$ is the codebook size and $d$ is the embedding dim (as in `nn.Embedding`).
-    - Loss: Same as wav2vec, except that the context network output $c_t$ predicts the future quantized latent representations $\tilde{z}_{t+k}$ rather than continous encoder output ${z}_{t+k}$.
+    - Loss: Same as wav2vec, except that the context network output $c_t$ predicts the future quantized latent representations $\tilde{z}_{t+k}$ rather than continuous encoder output $z_{t+k}$.
   - **(2) BERT on discrete audio tokens**: The discretization step allows a direct drop-in of algorithms from NLP which are built around discrete inputs. BERT encoder is trained on the discretized unlabeled audio tokens.
   - **(3) ASR using BERT representations**: Acoustic models are trained on labeled speech data using BERT representations as inputs instead of log-mel spectrogram features.
 - **Two approaches to Vector Quantization**:
@@ -79,10 +79,10 @@
       - Probability for choosing the $j$-th codebook entry is $p_j = \frac{\exp(l_j + g_j) / \tau}{\sum_{v=1}^V \exp(l_v + g_v) / \tau}$, where $g = -\log(-\log(u))$ is the Gumbel noise, $u \sim U(0,1)$ are uniform samples, and $\tau$ is the temperature parameter to approximate argmax as in Gumbel-max.
       - The added Gumbel noise helps sample discrete values from the distribution $l$ while making the process differentiable thanks to the reparametrization trick. The temperature parameter $\tau$ helps approximate the non-differentiable argmax op in Gumbel-max.
       - During forward pass, pick the codebook entry $\tilde{z}$ corresponding to the largest $p$. This non-differentiable step is still needed as we don't want a weighted sum of codebook entries, but strictly want to select a single codebook entry.
-      - During backward pass, the usage of straight-through estimator (STE) enables gradient flow from the chosen $\tilde{z}$ to the distribution $p$. The actual implementation can be formulated as going from $p$ to argmax one-hot, and then applying STE to bypass argmax:
-        - $p_{onehot} = onehot(argmax_j p_j)$
-        - $p_{onehot} = (p_{onehot} - p).detach() + p$
-        - $\tilde{z} = codebook[p_{onehot}]$
+      - During backward pass, the usage of straight-through estimator (STE) enables gradient flow from the chosen $\tilde{z}$ to the distribution $p$. The actual implementation can be formulated as going from $p$ to argmax one-hot, and then applying STE to bypass the non-differentiable argmax op$:
+        - $p_{\text{onehot}} = \text{onehot}(\text{argmax}_j p_j)$
+        - $p_{\text{onehot}} = (p_{\text{onehot}} - p).\text{detach}() + p$
+        - $\tilde{z} = \text{codebook}[p_{\text{onehot}}]$
     - **Inference:**
       - We simply pick the codebook entry corresponding to the largest index in $l$.
       - No Gumbel-noise is added during inference as we don't have to sample and we don't need gradients.
@@ -125,7 +125,7 @@
     - Gumbel-Softmax approach from vq-wav2vec.
     - Product Quantization (PQ) with $G$ groups. Product  quantization  amounts  to  choosing  quantized  representations  from multiple codebooks and concatenating them.
 - **Objective**: Loss $L = L_{contrastive} + \alpha L_{codebook-diversity}$
-  - **Contrastive loss**: $L_{contrastive} = -\log \frac{\exp(sim(c_t, q_t) / \tau)}{\sum_{k=1}^{K+1} \exp(sim(c_t, q_k) / \tau)}$, where $sim(a, b) = \frac{ab}{\Vert a \Vert \Vert b \Vert}$ is the cosine similarity between context representations and quantized latent representations.
+  - **Contrastive loss**: $L_{contrastive} = -\log \frac{\exp(\text{sim}(c_t, q_t) / \tau)}{\sum_{k=1}^{K+1} \exp(\text{sim}(c_t, q_k) / \tau)}$, where $\text{sim}(a, b) = \frac{a \cdot b}{\|a\| \|b\|}$ is the cosine similarity between context representations and quantized latent representations.
     - Given context network output $c_t$ centered over masked time step $t$, the model needs to identify the true quantized latent representation $q_t$ amidst $K$ negative samples / distractors.
     - Negatives/distractors are uniformly sampled from other masked time steps of the same utterance.
     - **Notable difference from wav2vec**: wav2vec's contrastive loss takes a sigmoid cross-entropy formulation (multiple binary decisions, one per sample), where as wav2vec 2.0 takes a softmax cross-entropy formulation (categorial classification, single multinomial decision over all samples). <https://chatgpt.com/share/68a24514-7654-8005-ac77-5f6ddd099c57>
@@ -138,7 +138,7 @@
   - Outperforms previous SoTA with 100x less labeled data on Librispeech.
 - **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
-  **wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
+  - **wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
   - **vq-wav2vec -> wav2vec 2.0**: Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
 
 ## [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units
@@ -159,7 +159,7 @@
   - **Extension - Iterative refinement of cluster targets**: Another  direction for improved representation is refining the cluster assignments for target prediction throughout the learning process. Example: start the training process with cluster targets as k-means over MFCC features, but progressively change it up to predict clusters computed over learned latent representations of the model being trained.
 - **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
   - **wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
-  **wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
+  - **wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
   - **vq-wav2vec -> wav2vec 2.0**: Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
   - **wav2vec 2.0 -> HuBERT**: Conceptually a "step back" from wav2vec 2.0 in terms of being fully end-to-end. wav2vec 2.0 is farther right on the self-supervision axis as the targets for contrastive loss are also generated by the model itself (via its quantizaton module). On the other hand, HuBERT takes a more "conservative" approach by generating offline targets via k-means clustering of MFCC features to favor more stable learning. HuBERT does update its targets during the course of training by clustering intermediate layer features, but this is done much more infrequently (whereas wav2vec 2.0 can be seen as updating its targets after every gradient update step).
 
@@ -180,7 +180,7 @@
   - **(1) Encoder (fully convolutional)**: takes raw audio waveform and produces a stream of embeddings at a lower sampling rate.
     - only causal conv: padding applied to the past and not to the future
     - 24kHz original waveform to 75Hz embeddings.
-  - **(2) RVQ (Residual Vector Quantizer)**: a varaible number of residual vector quantizers that take the embeddings and quantize.
+  - **(2) RVQ (Residual Vector Quantizer)**: a variable number of residual vector quantizers that take the embeddings and quantize.
   - **(3) Decoder (fully convolutional)**: takes quantized embeddings and reconstructs an approximation of the original waveform.
     - Transposed conv for upsampling, but otherwise similar to the encoder reversed.
     - 75Hz quantized embeddings to 24kHz reconstructed waveform.
@@ -189,14 +189,14 @@
   - "Quantizer dropout" helps the model handle different bitrates.
   - Compared to mel-spectrogram features, the learned encoder had much better coding efficiency.
 - **Residual Vector Quantizer (RVQ)**:
-  - Goal: Compress the output of the encoder $enc(x) \in R^{T \times D}$ to a target bitrate of $R$ bits per second (bps).
+  - Goal: Compress the output of the encoder $\text{enc}(x) \in \mathbb{R}^{T \times D}$ to a target bitrate of $R$ bits per second (bps).
   - Naive Vector Quantizer (VQ) will lead to a prohibitively large codebook size. For example, if the target bitrate $R$ is 5000 bps, and the encoder output is at 50Hz (50 frames/sec), then this corresponds to 5000/50 = 100 bits allocated to each frame. This would mean a codebook / lookup table size of $2^{100}$ entries.
   - On the other hand, with Residual Vector Quantizer (RVQ), the same 100 bits for each frame can be allocated by using $N_q = 10$ vector quantizers to sequentially quantize the residuals, each with a codebook size of $2^{10}$ entries (much more manageable).
   - The codebook is initialized with k-means of the first batch embeddings and then updated using exponential moving average (rather than backprop): <https://chatgpt.com/share/689cad67-5ff4-8005-b471-7de54dc8f206>
     - > The codebook of each quantizer is trained with exponential moving  average  updates,  following  the  method  proposed  in VQ-VAE-2 [32]. To improve the usage of the codebooks we use two additional methods. First, instead of using a random initialization  for  the  codebook  vectors,  we  run  the  k-means algorithm  on  the  first  training  batch  and  use  the  learned centroids  as  initialization.  This  allows  the  codebook  to  be close to the distribution of its inputs and improves its usage. Second, as proposed in [34], when a codebook vector has not been assigned any input frame for several batches, we replace it with an input frame randomly sampled within the current batch. More precisely, we track the exponential moving average of the assignments to each vector (with a decay factor of 0.99) and replace the vectors of which this statistic falls below 2.
 - **Quantizer dropout to build a single model that works for different bitrates**:
   - > Since the vector quantizers are trained jointly with the encoder/decoder, in principle a different SoundStream model should be trained for each target bitrate. Instead, having a single bitrate scalable model that can operate at several target bitrates is much more practical, since this reduces the memory footprint needed to store model parameters both at the encoder and decoder side.
-  - This is done by randomly selecting the first $n_q$ of the total $N_q$ vector quantizers. In the example above, we had 10 vector quantizers of 2^10 entries each to achieve a total bitrate per frame of 100 bits. If we choose, say, the first 7 vector quantizers and drop the rest, then the bitrate per frame will be 70 bits.
+  - This is done by randomly selecting the first $n_q$ of the total $N_q$ vector quantizers. In the example above, we had 10 vector quantizers of $2^{10}$ entries each to achieve a total bitrate per frame of 100 bits. If we choose, say, the first 7 vector quantizers and drop the rest, then the bitrate per frame will be 70 bits.
   - During training, quantizer dropout is applied as above. During inference, for a target bitrate, we choose the required number of the first $n_q$ quantizers.
   - > A key advantage of our residual vector quantizer is that the dimensionality of the embeddings does not change with the bitrate. Indeed, the additive composition of  the  outputs  of  each  VQ  layer  progressively  refines  the quantized embeddings, while keeping the same shape. Hence, no architectural changes are needed in neither the encoder nor the decoder to accommodate different bitrates
 - **Training objective**:
@@ -206,9 +206,9 @@
     - Discriminator: $D(x)$ is the discriminator trained to distinguish between the original $x$ and the reconstructed $\hat{x}$ audio.
   - Loss $L = L_{D} + L_{G}^{adversarial} + L_{G}^{reconstruction}$
     - **Reconstruction loss** $L_{G}^{reconstruction}$: L1 or L2 loss between the spectrograms of the original $x$ and decoded $\hat{x}$ audio.
-    - **Adversarial loss** $L_{G}^{adversarial}$: Hinge loss forcing the generator to produce outputs that the discriminator classifies as "real" (+1) and not as "fake" (-1). $max(0, 1 - D(G(x)))$.
-      - **Hinge loss**: Used for maximum margin classification (such as in SVM). $L(y') = max(0, 1 - y * y')$, where $y$ is the ground-truth class (either +1 or -1), and $y'$ is the predicted logit ("raw" output of the classifier's decision function, not the predicted class label). When $y$ and $y'$ have the same sign (meaning y predicts the right class) and $|y'| \ge 1$ (correct class prediction and enough margin), the loss is 0. When they have the same sign, but $|y'| \lt 1$ (correct class prediction, but not enough margin), the loss decreases linearly with $y'$. When they have opposite signs (incorrect class prediction), the loss increases linearly with $y'$. <https://en.wikipedia.org/wiki/Hinge_loss>.
-    - **Discriminator loss** $L_{D}$: Hinge loss over the logits of the discriminator forcing it to classify $x$ as real (+1) and $G(x)$ as fake (-1). $max(0, 1 - D(x)) + max(0, 1 + D(G(x)))$.
+    - **Adversarial loss** $L_{G}^{adversarial}$: Hinge loss forcing the generator to produce outputs that the discriminator classifies as "real" (+1) and not as "fake" (-1). $\max(0, 1 - D(G(x)))$.
+      - **Hinge loss**: Used for maximum margin classification (such as in SVM). $L(y') = \max(0, 1 - y \cdot y')$, where $y$ is the ground-truth class (either +1 or -1), and $y'$ is the predicted logit ("raw" output of the classifier's decision function, not the predicted class label). When $y$ and $y'$ have the same sign (meaning y predicts the right class) and $|y'| \geq 1$ (correct class prediction and enough margin), the loss is 0. When they have the same sign, but $|y'| < 1$ (correct class prediction, but not enough margin), the loss decreases linearly with $y'$. When they have opposite signs (incorrect class prediction), the loss increases linearly with $y'$. <https://en.wikipedia.org/wiki/Hinge_loss>.
+    - **Discriminator loss** $L_{D}$: Hinge loss over the logits of the discriminator forcing it to classify $x$ as real (+1) and $G(x)$ as fake (-1). $\max(0, 1 - D(x)) + \max(0, 1 + D(G(x)))$.
 - **Joint compression and enhancement using FiLM conditioning**:
   - Typically, audio compression and audio enhancement are done by separate modules.
   - In SoundStream codec training, compression and enhancement is merged into a single model as follows:
@@ -240,14 +240,14 @@
     - **Semantic tokens (coarse)**: constructed from a model pretrained with a self-supervised masked language modeling objective.
     - **Acoustic tokens (finer)**: produced by SoundStream neural codec.
 - **Three components of the model**:
-  - **(1) Tokenizer**: Takes a single-channel audio sequence $x \in R^T$ and produces a sequence of discrete tokens $h = enc(x)$ of length $T' \ll T$.
-  - **(2) Decoder-only transformer language model** that operates on $h$ to predict the next sequence of tokes $\hat{h}$ autoregressively. Since $T' \ll T$, the language model can now capture long-term dependency more efficiently (as self-attention complexity grows quadratically wrt sequence length).
-  - **(3) Detokenizer**: Maps the sequence of predicted tokens $\hat{h}$ to produce the output audio waveform $\hat{x} = dec(\hat{x})$.
+  - **(1) Tokenizer**: Takes a single-channel audio sequence $x \in \mathbb{R}^T$ and produces a sequence of discrete tokens $h = \text{enc}(x)$ of length $T' \ll T$.
+  - **(2) Decoder-only transformer language model** that operates on $h$ to predict the next sequence of tokens $\hat{h}$ autoregressively. Since $T' \ll T$, the language model can now capture long-term dependency more efficiently (as self-attention complexity grows quadratically wrt sequence length).
+  - **(3) Detokenizer**: Maps the sequence of predicted tokens $\hat{h}$ to produce the output audio waveform $\hat{x} = \text{dec}(\hat{h})$.
   - In AudioLM, (1) and (3) are pretrained and frozen (such as from SoundStream and w2v-BERT), and only (2) is trained.
 - **Details**:
   - **Hybrid tokenization scheme** combining acoustic and semantic tokens:
-    - **(i) Acoustic tokens** produced by SoundStream model (encoder + RVQ). See SoundStream notes for details. For a SoundStream model with $Q$ residual vector quantizers with $N$ bits allocated to each (such that the codebook size per quantizer is $2^N$), the raw audio waveform $x \in R^T$ is transformed to $y \in \{1,...,2^N\}^{T_A \times Q}$ discrete tokens, where $T/T_A$ is the downsampling factor of the SoundStream encoder.
-    - **(ii) Semantic tokens** produced by an intermediate layer of w2v-BERT after applying k-means and using the centroid indices. With $K$ clusters, the raw audio waveform $x \in R^T$ is transformed to $z \in {1,...,K}^{T_S}$, where $T/T_S$ is the downsampling factor of the w2v-BERT encoder.
+    - **(i) Acoustic tokens** produced by SoundStream model (encoder + RVQ). See SoundStream notes for details. For a SoundStream model with $Q$ residual vector quantizers with $N$ bits allocated to each (such that the codebook size per quantizer is $2^N$), the raw audio waveform $x \in \mathbb{R}^T$ is transformed to $y \in \{1,...,2^N\}^{T_A \times Q}$ discrete tokens, where $T/T_A$ is the downsampling factor of the SoundStream encoder.
+    - **(ii) Semantic tokens** produced by an intermediate layer of w2v-BERT after applying k-means and using the centroid indices. With $K$ clusters, the raw audio waveform $x \in \mathbb{R}^T$ is transformed to $z \in \{1,...,K\}^{T_S}$, where $T/T_S$ is the downsampling factor of the w2v-BERT encoder.
     - The combination of acoustic and semantic tokens helps reconcile conflicting requirements - fine-grained acoustic tokenization (more number of tokens for a fixed time window) helps reconstructing higher quality audio, whereas coarse-grained semantic tokenization (fewer number of tokens for a fixed time window) helps capture long-term dependency efficiently.
   - **Hierarchical modeling of semantic and acoustic tokens**: (Fig 2)
     - In what order should the semantic and acoustic tokens be presented to language model training? Key insights:
@@ -262,7 +262,7 @@
     - Target application: Given an audio prompt $x$, generate continuations that maintain both semantic and acoustic coherence.
     - Steps:
       - **Step 1 (Semantic token generation)**: First obtain semantic tokens corresponding to the prompt $x$ from w2v-BERT encoder and feed those into the transformer language model to generate semantic token completions.
-      - **Step 2 (Coarse acoustic token generation)**: Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the corase acoustic token completions.
+      - **Step 2 (Coarse acoustic token generation)**: Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the coarse acoustic token completions.
       - **Step 3 (Fine acoustic token generation)**: Concatenate the entire coarse acoustic token sequence (corresponding to the prompt as well as those generated above) along with the fine acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the fine acoustic model to generate the fine acoustic token completions.
       - **Step 4 (SoundStream decoder for audio generation)**: Finally, feed all the acoustic tokens to the SoundStream decoder to reconstruct the audio waveform output $\hat{x}$.
 - **Lineage**: <https://chatgpt.com/share/68a496b4-6e40-8005-813f-707298b27f4e>
