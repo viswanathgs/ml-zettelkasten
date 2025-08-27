@@ -1,7 +1,7 @@
 # Speech/Audio
 
 - **Created**: 2025-07-16
-- **Last Updated**: 2025-08-19
+- **Last Updated**: 2025-08-27
 - **Status**: `In Progress`
 
 ---
@@ -12,8 +12,8 @@
 - [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
 - [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
+- [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
-- [X] [2023] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
 - [ ] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
@@ -50,6 +50,8 @@
     - wav2vec + ASR aren't trained end-to-end. wav2vec is first trained and frozen, and then its representations are used as inputs to train a CTC-style ASR model.
   - **ASR Decoding**: Maximize $\log p_{\text{CTC}}(Y \mid C) + \alpha \log P_{\text{LM}}(Y) + \beta |Y|$, where $p_{\text{LM}}$ is a language model and the last term is the insertion bonus.
   - Outperforms the best character-based ASR model at that time (DeepSpeech 2) using two orders of magnitude less labeled training data.
+- **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
+  - **(1) wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
 
 ## [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations
 
@@ -99,8 +101,8 @@
     - **Gumbel-Softmax vs K-means approaches to quantization**: <https://chatgpt.com/share/68a39c2c-db50-8005-b153-150bc2eaa58f>
   - Product Quantization (PQ) can be applied to the codebook to improve performance. That is, instead of replacing the latent representation $z \in \mathbb{R}^d$ by a single codebook entry $e_i \in \mathbb{R}^{V \times d}$ where $V$ is the number of codebook entries, $z$ can be organized into $G$ groups such that $z \in \mathbb{R}^{G \times (d/G)}$, with $G$ codebooks of size $V \times (d/G)$ each.
 - **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
-  - **wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
-  - **wav2vec -> vq-wav2vec**: Add discretization, make speech look like language tokens, apply BERT-style masked LM.
+  - **(1) wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+  - **(2) wav2vec -> vq-wav2vec**: Add discretization, make speech look like language tokens, apply BERT-style masked LM.
 
 ## [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations
 
@@ -137,9 +139,9 @@
   - Finetuning for ASR by adding a linear projection on top of the context network, and trained with CTC.
   - Outperforms previous SoTA with 100x less labeled data on Librispeech.
 - **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
-  - **wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
-  - **wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
-  - **vq-wav2vec -> wav2vec 2.0**: Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
+  - **(1) wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+  - **(2) wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
+  - **(3) vq-wav2vec -> wav2vec 2.0**: Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
 
 ## [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units
 
@@ -158,10 +160,10 @@
   - **Extension - Cluster ensembles**: Can extend this trivially to cluster ensembles. Example, an ensemble of k-means models with different codebook sizes can create targets of different granularity and help learn richer representations. Loss is then summed over the ensembles.
   - **Extension - Iterative refinement of cluster targets**: Another  direction for improved representation is refining the cluster assignments for target prediction throughout the learning process. Example: start the training process with cluster targets as k-means over MFCC features, but progressively change it up to predict clusters computed over learned latent representations of the model being trained.
 - **Lineage**: <https://chatgpt.com/share/68a3908b-d03c-8005-b91e-5f2571b2acc0>
-  - **wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
-  - **wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
-  - **vq-wav2vec -> wav2vec 2.0**: Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
-  - **wav2vec 2.0 -> HuBERT**: Conceptually a "step back" from wav2vec 2.0 in terms of being fully end-to-end. wav2vec 2.0 is farther right on the self-supervision axis as the targets for contrastive loss are also generated by the model itself (via its quantizaton module). On the other hand, HuBERT takes a more "conservative" approach by generating offline targets via k-means clustering of MFCC features to favor more stable learning. HuBERT does update its targets during the course of training by clustering intermediate layer features, but this is done much more infrequently (whereas wav2vec 2.0 can be seen as updating its targets after every gradient update step).
+  - **(1) wav2vec**: Raw audio $X$ to latent representation $Z$ (encoder network $f \colon X \to Z$) and then to context embeddings $C$ (context network $g \colon Z \to C$). The model is trained to have $c_t$ distinguish latent representations $k$ steps in the future $z_{t+k}$ from negative latent representations $z'$ using a contrastive loss.
+  - **(2) wav2vec -> vq-wav2vec**: Add discretization to the latent representation ($q \colon Z \to \tilde{Z}$), and have the context network output $c_t$ predict the reconstructed latent rather $k$ steps in the future ($\tilde{z}_{t+k}$) rather than the continuous latent embedding ($z_{t+k}$). Make speech look like language tokens, apply BERT-style masked LM.
+  - **(3) vq-wav2vec -> wav2vec 2.0**: Collapse the two-stage pipeline of vq-wav2vec (wav2vec producing discrete audio tokens, and then using those audio tokens to train a BERT-style masked LM) into one model; instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly; downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
+  - **(4) wav2vec 2.0 -> HuBERT**: Conceptually a "step back" from wav2vec 2.0 in terms of being fully end-to-end. wav2vec 2.0 is farther right on the self-supervision axis as the targets for contrastive loss are also generated by the model itself (via its quantizaton module). On the other hand, HuBERT takes a more "conservative" approach by generating offline targets via k-means clustering of MFCC features to favor more stable learning. HuBERT does update its targets during the course of training by clustering intermediate layer features, but this is done much more infrequently (whereas wav2vec 2.0 can be seen as updating its targets after every gradient update step).
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
@@ -215,18 +217,10 @@
     - FiLM (Feature-wise Linear  Modulation) conditioning based on a boolean `denoise` parameter.
     - During training, when denoise is False, the input and target audio are the same. When denoise is True, the target is the cleaner/enhanced version of the input audio.
     - When the input itself is clean, the model is trained with input = target and denoise being both True and False. This is done to prevent SoundStream from adversely affecting clean audio when denoising is enabled.
+- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
 
-## [2023] SoundStorm: Efficient Parallel Audio Generation
-
-- **Date**: 2025-08-19
-- **Arxiv**: <https://arxiv.org/abs/2305.09636>
-- **Paperpile**: <https://app.paperpile.com/view/?id=b6a32e14-6a86-4bce-bfed-888e152d13c4>
-
----
-
-- TODO
-
-## [2023] AudioLM: a Language Modeling Approach to Audio Generation
+## [2022] AudioLM: a Language Modeling Approach to Audio Generation
 
 - **Date**: 2025-08-10
 - **Arxiv**: <https://arxiv.org/abs/2209.03143>
@@ -265,7 +259,23 @@
       - **Step 2 (Coarse acoustic token generation)**: Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the coarse acoustic token completions.
       - **Step 3 (Fine acoustic token generation)**: Concatenate the entire coarse acoustic token sequence (corresponding to the prompt as well as those generated above) along with the fine acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the fine acoustic model to generate the fine acoustic token completions.
       - **Step 4 (SoundStream decoder for audio generation)**: Finally, feed all the acoustic tokens to the SoundStream decoder to reconstruct the audio waveform output $\hat{x}$.
-- **Lineage**: <https://chatgpt.com/share/68a496b4-6e40-8005-813f-707298b27f4e>
+- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
+  - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
+
+## [2023] SoundStorm: Efficient Parallel Audio Generation
+
+- **Date**: 2025-08-27
+- **Arxiv**: <https://arxiv.org/abs/2305.09636>
+- **Paperpile**: <https://app.paperpile.com/view/?id=b6a32e14-6a86-4bce-bfed-888e152d13c4>
+
+---
+
+- TODO
+- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
+  - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
+  - **(3) SoundStorm:** Efficiency improvement over the slow autoregressive decoding process of AudioLM.
 
 ## [2023] AudioPaLM: A Large Language Model That Can Speak and Listen
 
@@ -304,6 +314,11 @@
     - Similar in spirit to chain of thought prompting, can prompt the model to output intermediate steps.
     - Example, for `[S2ST English French]` can be alternatively prompted as `[ASR AST S2ST English French]` so that it outputs the intermediate English and French text transcriptions in addition to the final French audio.
     - Note: This is not the same as calling the model three times. The model performs the task of `[ASR AST S2ST English French]` as a single autoregressive decoding process. This means it can attend to the intermediate decoding tokens (English and French text tokens in this example) to improve performance, in addition to attending to just the input tokens (English audio tokens) and the prior decoded output tokens (partial French audio tokens).
+- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
+  - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
+  - **(3) SoundStorm:** Efficiency improvement over the slow autoregressive decoding process of AudioLM.
+  - **(4) AudioPaLM:** Merges AudioLM (speech-only LM) with PaLM-2 (text-only LM) by unifying the audio and text vocabularies into a single multimodal vocabulary. Allows for training a single model in both directions, arbitrary interleaving of speech and text, and enables a single model to do ASR, TTS, speech-to-speech translation, etc.
 
 ### [2023] Prompting Large Language Models with Speech Recognition Abilities
 
