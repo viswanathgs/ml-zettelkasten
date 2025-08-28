@@ -9,8 +9,11 @@
 ---
 
 - [X] [2024,MLSys] Kurt Keutzer, "GenAI efficiency is more than about models" <https://mlsys.org/media/mlsys-2024/Slides/2668.pdf>
-  - “The right perspective, context, or point of view is worth 80 IQ points” - Alan Kay
-- [ ] [2024,MLSys] Yejin Choi, "Possible Impossibilities and Impossible Possibilities" <https://mlsys.org/virtual/2024/invited-talk/2590>
+  - > "The right perspective, context, or point of view is worth 80 IQ points" - Alan Kay
+- [X] [2024,MLSys] Yejin Choi, "Possible Impossibilities and Impossible Possibilities" <https://mlsys.org/virtual/2024/invited-talk/2590>
+  - > Circa 1878, Philipp von Jolly to Max Planck regarding pursuing theoretical physics: "In this field, almost everything is already discovered, and all that remains is to fill a few unimportant holes". Max Planck, before eventually going ahead and creating an entirely new field of Quantum Physics: "I don't wish to discover new things, only to understand the known fundamentals".
+  - > "While extreme-scale LLMs are truly fascinating, there's something fundamentally odd about how they handle corner cases".
+  - > "Whenever something new was invented in the history of humanity, the first solution has rarely been the optimal one; it's likely that there's a better solution that's not as compute heavy".
 - [ ] [2024,MLSys] Zico Kotler, "AI Robustness and Security in the Age of LLMs" <https://mlsys.org/virtual/2024/invited-talk/2593>
 - [ ] [2024,MLSys] Jeff Dean, "Exciting Directions in Systems for Machine Learning" <https://mlsys.org/virtual/2024/invited-talk/2592>
 - [X] [2024,ICML] Chelsea Finn, "What robots have taught me about machine learning" <https://icml.cc/virtual/2024/invited-talk/35253>
