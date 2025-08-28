@@ -12,6 +12,7 @@
 - [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
 - [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
+- [ ] [2022] EnCodec: High Fidelity Neural Audio Compression. <https://arxiv.org/abs/2210.13438>
 - [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
@@ -271,7 +272,13 @@
 
 ---
 
-- TODO
+- **Intro:**
+  - AudioLM's autoregressive decoding process is too slow for audio generation. For generating high-quality audio by modeling the tokens of a neural codec (like SoundStream), the rate of the discrete tokens should be high, resulting in either an exponential growth in codebook size or in long token sequences. For attention-based models, runtime complexity is quadradic wrt sequence length, leading to tradeoff between perception quality of the generated audio and runtime.
+  - Three orthogonal approaches to combat the problem of generating long audio token sequences:
+    - (a) efficient attention mechanisms,
+    - (b) non-autoregressive parallel decoding schemes,
+    - (c) custom architectures adapted to the special structure of tokens produced by neural audio codec.
+  - TODO
 - **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
   - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
   - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
@@ -320,7 +327,7 @@
   - **(3) SoundStorm:** Efficiency improvement over the slow autoregressive decoding process of AudioLM.
   - **(4) AudioPaLM:** Merges AudioLM (speech-only LM) with PaLM-2 (text-only LM) by unifying the audio and text vocabularies into a single multimodal vocabulary. Allows for training a single model in both directions, arbitrary interleaving of speech and text, and enables a single model to do ASR, TTS, speech-to-speech translation, etc.
 
-### [2023] Prompting Large Language Models with Speech Recognition Abilities
+## [2023] Prompting Large Language Models with Speech Recognition Abilities
 
 - **Date**: 2025-03-04
 - **Arxiv**: <https://arxiv.org/abs/2307.11795>
