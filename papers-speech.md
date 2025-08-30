@@ -273,12 +273,16 @@
 ---
 
 - **Intro:**
-  - AudioLM's autoregressive decoding process is too slow for audio generation. For generating high-quality audio by modeling the tokens of a neural codec (like SoundStream), the rate of the discrete tokens should be high, resulting in either an exponential growth in codebook size or in long token sequences. For attention-based models, runtime complexity is quadradic wrt sequence length, leading to tradeoff between perception quality of the generated audio and runtime.
+  - AudioLM's autoregressive decoding process is too slow for audio generation. For generating high-quality audio by modeling the tokens of a neural codec (such as SoundStream), the rate of the discrete tokens should be high, resulting in either an exponential growth in codebook size or in long token sequences. For attention-based models, runtime complexity is quadradic wrt sequence length, leading to tradeoff between perception quality of the generated audio and runtime.
   - Three orthogonal approaches to combat the problem of generating long audio token sequences:
     - (a) efficient attention mechanisms,
     - (b) non-autoregressive parallel decoding schemes,
-    - (c) custom architectures adapted to the special structure of tokens produced by neural audio codec.
-  - TODO
+    - (c) custom architectures adapted to the special structure of tokens produced by neural audio codec (such as relying on RVQ's hierachical structure in SoundStream and AudioLM).
+      - > We believe that it is the special structure of the audio token sequence that holds the most promise for future advances in long-sequence audio modeling. Concretely, both Sound- Stream (Zeghidour et al., 2022) and EnCodec (D ́efossez et al., 2022) rely on Residual Vector Quantization (RVQ), where each compressed audio frame is quantized by a series of quantizers, with each quantizer operating on the residual of the previous one, and the number of quantizers control- ling the overall bitrate.  This induces a hierarchical token structure, where tokens from finer RVQ levels contribute less to the perceptual quality, allowing for efficient factor- izations and approximations of the joint distribution of the token sequence. Hence, the models and decoding schemes should take this special structure of the input into account for efficient training and inference.
+  - SoundStorm improves efficiency of generating long audio token sequences by relying on:
+    - **(i) an architecture adapted to the hierarchical structure of audio tokens**,
+    - **(ii) a parallel, non-autoregressive, confidence-based decoding scheme inspired by MaskGIT** for residual vector quantized (RVQ) token sequences.
+- TODO
 - **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
   - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
   - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
