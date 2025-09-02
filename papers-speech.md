@@ -18,7 +18,6 @@
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
 - [ ] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
-- [ ] [2024] Faster Speech-Llama Inference with Multi-token Prediction. <https://arxiv.org/abs/2409.08148>
 - [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue. <https://arxiv.org/abs/2410.00037>
 - [ ] [2025] Sesame AI Conversational Speech Model. <https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice>
 
@@ -343,7 +342,7 @@
   - **(3) SoundStorm:** Efficiency improvement over the slow autoregressive decoding process of AudioLM.
   - **(4) AudioPaLM:** Merges AudioLM (speech-only LM) with PaLM-2 (text-only LM) by unifying the audio and text vocabularies into a single multimodal vocabulary. Allows for training a single model in both directions, arbitrary interleaving of speech and text, and enables a single model to do ASR, TTS, speech-to-speech translation, etc.
 
-## [2023] Prompting Large Language Models with Speech Recognition Abilities
+## [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities
 
 - **Date**: 2025-03-04
 - **Arxiv**: <https://arxiv.org/abs/2307.11795>
@@ -352,14 +351,14 @@
 ---
 
 - Simple approach overall. The goal is to leverage llama (trained just on text, not multilingual) to perform ASR.
-- Prepend text prompt with audio embeddings from a conformer trained with CTC.
+  - Speech embeddings + text-based LLM to improve upon ASR baselines.
+  - Not generative.
+  - No discretization of speech tokens anywhere unlike - the input to Llama is audio embeddings from conformer.
+- Prepend text prompt in Llama with audio embeddings from a conformer trained with CTC.
   - The initial input would be a sequence of audio embeddings followed by the `<BOS>` token at which point the LLM would start emitting text (hopefully transcribing the audio) auto-regressively.
-  - "The ASR-LLM problem can possibly be reinterpreted as a copying/translation task where the LLM needs to regurgitate the information in the audio sequence. If the audio encoder provides a sequence of embeddings aligned with the text embeddings the problem collapses to a repetition task which should not require the full capacity of an LLM."
+  - > The ASR-LLM problem can possibly be reinterpreted as a copying/translation task where the LLM needs to regurgitate the information in the audio sequence. If the audio encoder provides a sequence of embeddings aligned with the text embeddings the problem collapses to a repetition task which should not require the full capacity of an LLM.
 - Evaluate both using the LLM as is as well as LoRA-finetuned variant.
   - LoRA adaptor is only applied for the attention projection weights (q/k/v/o); feedforward, embedding and final linear layer weights remain frozen.
   - LoRA parameters: $\alpha = 16$ and $r = 8$.
-- Section 4: Cosine similarly between the audio embeddings and the text embeddings (lookup table in llama mapping tokens to vectors) shows monotonic similarity.
-- TODO: How does R = 0 (no LoRA, using the original LLM as is) work at all? Table 3
-- Section 4: "The speech recognition task can be interpreted as a regurgitation task -- the language model is tasked with cleaning and repeating (in the same order) information that is present in the audio encoder output sequence."
-  - "cleaning" is key
-- TODO
+- Section 4: Cosine similarly between the audio embeddings (output of speech conformer followed by linear projection to match dimensionality) and the text embeddings (output of llama's `nn.Embedding` mapping text tokens to embeddings) shows monotonic similarity.
+- > The speech recognition task can be interpreted as a regurgitation task -- the language model is tasked with cleaning and repeating (in the same order) information that is present in the audio encoder output sequence.
