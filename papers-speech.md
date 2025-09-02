@@ -12,7 +12,7 @@
 - [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
 - [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
-- [ ] [2022] EnCodec: High Fidelity Neural Audio Compression. <https://arxiv.org/abs/2210.13438>
+- [X] [2022] EnCodec: High Fidelity Neural Audio Compression. <https://arxiv.org/abs/2210.13438>
 - [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
@@ -220,6 +220,18 @@
     - When the input itself is clean, the model is trained with input = target and denoise being both True and False. This is done to prevent SoundStream from adversely affecting clean audio when denoising is enabled.
 - **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
   - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
+
+## [2022] EnCodec: High Fidelity Neural Audio Compression
+
+- **Date:** 2025-09-02
+- **Arxiv:** <https://arxiv.org/abs/2210.13438>
+- **Paperpile:** <https://app.paperpile.com/view/?id=9d3a89f3-7472-47fc-a42a-a08ee2ca1c54>
+
+---
+
+- **Abstract:**
+  - > We introduce a state-of-the-art real-time, high-fidelity, audio codec leveraging neural networks. It consists in a streaming encoder-decoder architecture with quantized latent space trained in an end-to-end fashion. We simplify and speed-up the training by using a single multiscale spectrogram adversary that efficiently reduces artifacts and produce high-quality samples. We introduce a novel loss balancer mechanism to stabilize training: the weight of a loss now defines the fraction of the overall gradient it should represent, thus decoupling the choice of this hyper-parameter from the typical scale of the loss. Finally, we study how lightweight Transformer models can be used to further compress the obtained representation by up to 40%, while staying faster than real time. We provide a detailed description of the key design choices of the proposed model including: training objective, architectural changes and a study of various perceptual loss functions. We present an extensive subjective evaluation (MUSHRA tests) together with an ablation study for a range of bandwidths and audio domains, including speech, noisy-reverberant speech, and music. Our approach is superior to the baselines methods across all evaluated settings, considering both 24 kHz monophonic and 48 kHz stereophonic audio. Code and models are available at github.com/facebookresearch/encodec.
+- SoundStream, with some improvements.
 
 ## [2022] AudioLM: a Language Modeling Approach to Audio Generation
 
