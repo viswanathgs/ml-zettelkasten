@@ -1,7 +1,7 @@
 # Vision
 
 - **Created**: 2025-07-21
-- **Last Updated**: 2025-07-21
+- **Last Updated**: 2025-09-03
 - **Status**: `Paused`
 
 ---
@@ -11,6 +11,7 @@
   - [ ] OpenCLIP code: <https://github.com/mlfoundations/open_clip>
 - [X] [2023] MetaCLIP: Demystifying CLIP Data. <https://arxiv.org/abs/2309.16671>
 - [ ] [2022] RQ-Transformer: Autoregressive Image Generation using Residual Quantization. <https://arxiv.org/abs/2203.01941>
+- [ ] [2022] MaskGIT: Masked Generative Image Transformer. <https://arxiv.org/abs/2202.04200>
 - [ ] <https://arxiv.org/abs/2506.22355>
 - [ ] Cambrian (Saining): <https://cambrian-mllm.github.io/>, <https://arxiv.org/abs/2406.16860>
 - [ ] TODO vision transformer (ViT)
