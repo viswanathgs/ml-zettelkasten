@@ -19,7 +19,7 @@
 - [X] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
 - [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue. <https://arxiv.org/abs/2410.00037>
-- [ ] [2025] Sesame AI Conversational Speech Model. <https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice>
+- [X] [2025] Sesame AI Conversational Speech Model. <https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice>
 
 ## [2019] wav2vec: Unsupervised Pre-training for Speech Recognition
 
