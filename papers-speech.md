@@ -1,7 +1,7 @@
 # Speech/Audio
 
 - **Created**: 2025-07-16
-- **Last Updated**: 2025-08-27
+- **Last Updated**: 2025-09-03
 - **Status**: `In Progress`
 
 ---
@@ -16,7 +16,7 @@
 - [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
 - [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
-- [ ] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
+- [X] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
 - [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue. <https://arxiv.org/abs/2410.00037>
 - [ ] [2025] Sesame AI Conversational Speech Model. <https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice>
@@ -76,7 +76,7 @@
 - **Two approaches to Vector Quantization**:
   - **(a) Gumbel-Softmax**: <https://chatgpt.com/share/68a5e923-6d40-8005-adf1-a1ab20a7ad4e>
     - Gumbel-Softmax to sample discrete codebook entries in a fully-differentiable manner.
-    - **Training:**
+    - **Training**:
       - Linear projection added to the dense latent representation $z$ to produce logits $l \in \mathbb{R}^V$ for Gumbel-Softmax to sample from the $V$ codebook entries.
       - Probability for choosing the $j$-th codebook entry is $p_j = \frac{\exp(l_j + g_j) / \tau}{\sum_{v=1}^V \exp(l_v + g_v) / \tau}$, where $g = -\log(-\log(u))$ is the Gumbel noise, $u \sim U(0,1)$ are uniform samples, and $\tau$ is the temperature parameter to approximate argmax as in Gumbel-max.
       - The added Gumbel noise helps sample discrete values from the distribution $l$ while making the process differentiable thanks to the reparametrization trick. The temperature parameter $\tau$ helps approximate the non-differentiable argmax op in Gumbel-max.
@@ -85,7 +85,7 @@
         - $p_{\text{onehot}} = \text{onehot}(\text{argmax}_j p_j)$
         - $p_{\text{onehot}} = (p_{\text{onehot}} - p).\text{detach}() + p$
         - $\tilde{z} = \text{codebook}[p_{\text{onehot}}]$
-    - **Inference:**
+    - **Inference**:
       - We simply pick the codebook entry corresponding to the largest index in $l$.
       - No Gumbel-noise is added during inference as we don't have to sample and we don't need gradients.
   - **(b) K-means**: <https://chatgpt.com/share/689f46dc-7978-8005-94d7-285099e82814>
@@ -217,18 +217,18 @@
     - FiLM (Feature-wise Linear  Modulation) conditioning based on a boolean `denoise` parameter.
     - During training, when denoise is False, the input and target audio are the same. When denoise is True, the target is the cleaner/enhanced version of the input audio.
     - When the input itself is clean, the model is trained with input = target and denoise being both True and False. This is done to prevent SoundStream from adversely affecting clean audio when denoising is enabled.
-- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
-  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
+- **Lineage**: <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream**: Foundational codec for discrete tokenization detokenization of audio.
 
 ## [2022] EnCodec: High Fidelity Neural Audio Compression
 
-- **Date:** 2025-09-02
-- **Arxiv:** <https://arxiv.org/abs/2210.13438>
-- **Paperpile:** <https://app.paperpile.com/view/?id=9d3a89f3-7472-47fc-a42a-a08ee2ca1c54>
+- **Date**: 2025-09-02
+- **Arxiv**: <https://arxiv.org/abs/2210.13438>
+- **Paperpile**: <https://app.paperpile.com/view/?id=9d3a89f3-7472-47fc-a42a-a08ee2ca1c54>
 
 ---
 
-- **Abstract:**
+- **Abstract**:
   - > We introduce a state-of-the-art real-time, high-fidelity, audio codec leveraging neural networks. It consists in a streaming encoder-decoder architecture with quantized latent space trained in an end-to-end fashion. We simplify and speed-up the training by using a single multiscale spectrogram adversary that efficiently reduces artifacts and produce high-quality samples. We introduce a novel loss balancer mechanism to stabilize training: the weight of a loss now defines the fraction of the overall gradient it should represent, thus decoupling the choice of this hyper-parameter from the typical scale of the loss. Finally, we study how lightweight Transformer models can be used to further compress the obtained representation by up to 40%, while staying faster than real time. We provide a detailed description of the key design choices of the proposed model including: training objective, architectural changes and a study of various perceptual loss functions. We present an extensive subjective evaluation (MUSHRA tests) together with an ablation study for a range of bandwidths and audio domains, including speech, noisy-reverberant speech, and music. Our approach is superior to the baselines methods across all evaluated settings, considering both 24 kHz monophonic and 48 kHz stereophonic audio. Code and models are available at github.com/facebookresearch/encodec.
 - SoundStream, with some improvements.
 
@@ -271,9 +271,9 @@
       - **Step 2 (Coarse acoustic token generation)**: Then, concatenate the entire semantic token sequence (corresponding to the prompt as well as those generated above) along with the coarse acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the coarse acoustic model to generate the coarse acoustic token completions.
       - **Step 3 (Fine acoustic token generation)**: Concatenate the entire coarse acoustic token sequence (corresponding to the prompt as well as those generated above) along with the fine acoustic tokens corresponding to the prompt $x$ (obtained from SoundStream). Feed this as conditioning to the fine acoustic model to generate the fine acoustic token completions.
       - **Step 4 (SoundStream decoder for audio generation)**: Finally, feed all the acoustic tokens to the SoundStream decoder to reconstruct the audio waveform output $\hat{x}$.
-- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
-  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
-  - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
+- **Lineage**: <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream**: Foundational codec for discrete tokenization detokenization of audio.
+  - **(2) AudioLM**: Train autoregressive generative LM over discrete audio tokens.
 
 ## [2023] SoundStorm: Efficient Parallel Audio Generation
 
@@ -283,7 +283,7 @@
 
 ---
 
-- **Intro:**
+- **Intro**:
   - AudioLM's autoregressive decoding process is too slow for audio generation. For generating high-quality audio by modeling the tokens of a neural codec (such as SoundStream), the rate of the discrete tokens should be high, resulting in either an exponential growth in codebook size or in long token sequences. For attention-based models, runtime complexity is quadradic wrt sequence length, leading to tradeoff between perception quality of the generated audio and runtime.
   - Three orthogonal approaches to combat the problem of generating long audio token sequences:
     - (a) efficient attention mechanisms,
@@ -294,10 +294,10 @@
     - **(i) an architecture adapted to the hierarchical structure of audio tokens**,
     - **(ii) a parallel, non-autoregressive, confidence-based decoding scheme inspired by MaskGIT** for residual vector quantized (RVQ) token sequences.
 - TODO
-- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
-  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
-  - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
-  - **(3) SoundStorm:** Efficiency improvement over the slow autoregressive decoding process of AudioLM.
+- **Lineage**: <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream**: Foundational codec for discrete tokenization detokenization of audio.
+  - **(2) AudioLM**: Train autoregressive generative LM over discrete audio tokens.
+  - **(3) SoundStorm**: Efficiency improvement over the slow autoregressive decoding process of AudioLM.
 
 ## [2023] AudioPaLM: A Large Language Model That Can Speak and Listen
 
@@ -336,11 +336,11 @@
     - Similar in spirit to chain of thought prompting, can prompt the model to output intermediate steps.
     - Example, for `[S2ST English French]` can be alternatively prompted as `[ASR AST S2ST English French]` so that it outputs the intermediate English and French text transcriptions in addition to the final French audio.
     - Note: This is not the same as calling the model three times. The model performs the task of `[ASR AST S2ST English French]` as a single autoregressive decoding process. This means it can attend to the intermediate decoding tokens (English and French text tokens in this example) to improve performance, in addition to attending to just the input tokens (English audio tokens) and the prior decoded output tokens (partial French audio tokens).
-- **Lineage:** <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
-  - **(1) SoundStream:** Foundational codec for discrete tokenization detokenization of audio.
-  - **(2) AudioLM:** Train autoregressive generative LM over discrete audio tokens.
-  - **(3) SoundStorm:** Efficiency improvement over the slow autoregressive decoding process of AudioLM.
-  - **(4) AudioPaLM:** Merges AudioLM (speech-only LM) with PaLM-2 (text-only LM) by unifying the audio and text vocabularies into a single multimodal vocabulary. Allows for training a single model in both directions, arbitrary interleaving of speech and text, and enables a single model to do ASR, TTS, speech-to-speech translation, etc.
+- **Lineage**: <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
+  - **(1) SoundStream**: Foundational codec for discrete tokenization detokenization of audio.
+  - **(2) AudioLM**: Train autoregressive generative LM over discrete audio tokens.
+  - **(3) SoundStorm**: Efficiency improvement over the slow autoregressive decoding process of AudioLM.
+  - **(4) AudioPaLM**: Merges AudioLM (speech-only LM) with PaLM-2 (text-only LM) by unifying the audio and text vocabularies into a single multimodal vocabulary. Allows for training a single model in both directions, arbitrary interleaving of speech and text, and enables a single model to do ASR, TTS, speech-to-speech translation, etc.
 
 ## [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities
 
@@ -362,3 +362,40 @@
   - LoRA parameters: $\alpha = 16$ and $r = 8$.
 - Section 4: Cosine similarly between the audio embeddings (output of speech conformer followed by linear projection to match dimensionality) and the text embeddings (output of llama's `nn.Embedding` mapping text tokens to embeddings) shows monotonic similarity.
 - > The speech recognition task can be interpreted as a regurgitation task -- the language model is tasked with cleaning and repeating (in the same order) information that is present in the audio encoder output sequence.
+
+## [2023] MusicGen: Simple and Controllable Music Generation
+
+- **Date**: 2025-09-03
+- **Arxiv**: <https://arxiv.org/abs/2306.05284>
+- **Paperpile**: <https://app.paperpile.com/view/?id=4f7cf33d-a180-44cf-a660-7a822c11ffea>
+
+---
+
+- **Intro**:
+  - Tackles the task of **conditional music generation** based on text and/or melody.
+  - Additional challenges with music generation compared to speech generation:
+    - (1) Requires modeling longer range sequences.
+    - (2) Unlike speech, music requires the use of full frequency spectrum.
+    - (3) Above leads to higher sampling rate (44.1 kHz or 48 kHz for music recordings vs 16 kHz for speech).
+    - (4) Humans are highly sensitive to disharmony, leaves little room for melodic errors.
+    - (5) Music creators need to be able to control the generation process in a diverse set of methods such as key, instruments, melody, genre, etc.
+  - Unlike prior works that take a cascaded or hierarchical approach, MusicGen relies on a **single-stage transformer LM operating over several streams of discrete tokens via efficient token interleaving patterns**.
+    - Introduces a general framework for modeling multiple parallel streams of acoustic tokens (such as the output of RVQ in SoundStream).
+    - Reduces the number of autoregresssive timesteps involved in generated acoustic tokens over all streams (corresponding to each codebook/quantizer in RVQ). For example, AudioLM hierarchically models the token steams from coarse to fine quantizers, essentially flattening all streams, and resulting in $T \times Q$ timesteps, where $Q$ is the number of quantizers/codebooks in RVQ.
+  - **Contributions**:
+    - (i) a simple and efficient model to generate high quality music at 32 kHz through an efficient codebook interleaving strategy.
+    - (ii) a single model to perform both text and melody-conditioned generation.
+    - (iii) extensive objective and human evaluations.
+- **Method**:
+  - **(1) Audio Tokenization**: Soundstream/EnCodec with $Q$ codebooks in RVQ, resulting in $Q$ parallel streams of discrete tokens.
+  - **(2) Codebook interleaving patterns** (Fig 1):
+    - **(a) Flattening pattern ($T \times Q$ timesteps)**: Baseline approach as in AudioLM. Flatten the outputs of all $Q$ streams, resulting in a sequence of $Q$ tokens per timestep predicted autoregressively. Fully satisfies dependencies along both $T$ and $Q$ axes, but wastefully.
+    - **(b) Parallel pattern ($T$ timesteps)**: At each time step, the model predicts logits for all $Q$ codebooks in parallel. Fully satisifies dependency only along $T$ axis.
+    - **(c) Coarse-first pattern ($T \times 2$ timesteps)**: First predict the tokens corresponding to zeroth/coarsest codebook for all $T$ timesteps autoregresively. Then, predict the remaining $Q-1$ codebook tokens in parallel for each of the $T$ timesteps, conditioned on the zeroth/coarsest codebook tokens. Partially satisifies dependencies along both $T$ and $Q$ axes.
+    - **(d) Delay pattern ($T + Q - 1$ timesteps)**: A pipelined approach with conceptual similarlity to pipeline parallelism bubble reduction strategies [[book-huggingface-ultra-scale-llm-training.md]]. Partially satisfies dependency along $T$ axis, fully satisfies dependency along $Q$ axis. See Fig 1.
+  - **(3) Model conditioning**:
+    - **(a) Text conditioning**: Given a textual description matching the input audio, generate a conditioning tensor $C \in \mathbb{R}^{T_C \times D}$ where $D$ is embedding dim of the autoregresssive model, such as using a pretrained text encoder.
+    - **(b) Melody conditioning**: Optionally also condition ussing the chromagram of another track.
+      - > In preliminary experiments, we observed that conditioning on the raw chromagram often led to reconstructing the original sample, resulting in overfitting. To reduce it, we introduce an information bottleneck by choosing the dominant time-frequency bin in each time step.
+  - **(4) Model architecture**:
+    - The core architecture itself is a standard transformer decoder, but input token embedding lookup results sum according to the contribution from each codebook, and the output logic projection is modified accordingly to predict multiple codebook entries in parallel.
