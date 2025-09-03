@@ -6,20 +6,20 @@
 
 ---
 
-- [X] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition. <https://arxiv.org/abs/1904.05862>
-- [X] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations. <https://arxiv.org/abs/1910.05453>
-- [X] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations. <https://arxiv.org/abs/2006.11477>
-- [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units. <https://arxiv.org/abs/2106.07447>
-- [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision. <https://arxiv.org/abs/2212.04356>
-- [X] [2021] SoundStream: An End-to-End Neural Audio Codec. <https://arxiv.org/abs/2107.03312>
-- [X] [2022] EnCodec: High Fidelity Neural Audio Compression. <https://arxiv.org/abs/2210.13438>
-- [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation. <https://arxiv.org/abs/2209.03143>
-- [ ] [2023] SoundStorm: Efficient Parallel Audio Generation. <https://arxiv.org/abs/2305.09636>
-- [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen. <https://arxiv.org/abs/2306.12925>
-- [X] [2023] MusicGen: Simple and Controllable Music Generation. <https://arxiv.org/abs/2306.05284>
-- [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities. <https://arxiv.org/abs/2307.11795>
-- [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue. <https://arxiv.org/abs/2410.00037>
-- [X] [2025] Sesame AI Conversational Speech Model. <https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice>
+- [X] [2019] wav2vec: Unsupervised Pre-training for Speech Recognition - [paper](https://arxiv.org/abs/1904.05862)
+- [X] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations - [paper](https://arxiv.org/abs/1910.05453)
+- [X] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations - [paper](https://arxiv.org/abs/2006.11477)
+- [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units - [paper](https://arxiv.org/abs/2106.07447)
+- [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision - [paper](https://arxiv.org/abs/2212.04356)
+- [X] [2021] SoundStream: An End-to-End Neural Audio Codec - [paper](https://arxiv.org/abs/2107.03312)
+- [X] [2022] EnCodec: High Fidelity Neural Audio Compression - [paper](https://arxiv.org/abs/2210.13438)
+- [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation - [paper](https://arxiv.org/abs/2209.03143)
+- [ ] [2023] SoundStorm: Efficient Parallel Audio Generation - [paper](https://arxiv.org/abs/2305.09636)
+- [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen - [paper](https://arxiv.org/abs/2306.12925)
+- [X] [2023] MusicGen: Simple and Controllable Music Generation - [paper](https://arxiv.org/abs/2306.05284)
+- [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities - [paper](https://arxiv.org/abs/2307.11795)
+- [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue - [paper](https://arxiv.org/abs/2410.00037)
+- [X] [2025] Sesame AI Conversational Speech Model - [blog](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice)
 
 ## [2019] wav2vec: Unsupervised Pre-training for Speech Recognition
 
