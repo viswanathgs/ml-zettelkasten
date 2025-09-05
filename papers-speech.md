@@ -10,7 +10,7 @@
 - [X] [2019] vq-wav2vec: Self-Supervised Learning of Discrete Speech Representations - [paper](https://arxiv.org/abs/1910.05453)
 - [X] [2020] wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations - [paper](https://arxiv.org/abs/2006.11477)
 - [X] [2021] HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units - [paper](https://arxiv.org/abs/2106.07447)
-- [ ] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision - [paper](https://arxiv.org/abs/2212.04356)
+- [X] [2022] Whisper: Robust Speech Recognition via Large-Scale Weak Supervision - [paper](https://arxiv.org/abs/2212.04356)
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec - [paper](https://arxiv.org/abs/2107.03312)
 - [X] [2022] EnCodec: High Fidelity Neural Audio Compression - [paper](https://arxiv.org/abs/2210.13438)
 - [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation - [paper](https://arxiv.org/abs/2209.03143)
@@ -170,10 +170,48 @@
 - **Date**: 2025-09-03
 - **Arxiv**: <https://arxiv.org/abs/2212.04356>
 - **Paperpile**: <https://app.paperpile.com/view/?id=170c2958-cbd1-41de-a6cc-8ef0fc1ee507>
+- **Code**: <https://github.com/openai/whisper>
 
 ---
 
-- TODO
+- **Intro**:
+  - Self-supervised methods like wav2vec 2.0 has energized progress in speech recognition because they can rely on much larger datasets of raw audio without the need for human labels.
+    - But their usefulness is limited because they require finetuning on a downstream task like ASR to be usable.
+    - Finetuning also carries the risk of overfitting to the quirks of the specific dataset without meaningfully improving generalization.
+    - > Machine learning methods are exceedingly adept at finding patterns within a training dataset which boost performance on held-out data from the same dataset. However, some of these patterns are brittle and spurious and don’t generalize to other datasets and distributions. In a particularly disturbing example, Rad- ford et al. (2021) documented a 9.2% increase in object classification accuracy when fine-tuning a computer vision model on the ImageNet dataset (Russakovsky et al., 2015) without observing any improvement in average accuracy when classifying the same objects on seven other natural image datasets. A model that achieves “superhuman” per- formance when trained on a dataset can still make many basic errors when evaluated on another, possibly precisely because it is exploiting those dataset-specific quirks that humans are oblivious to (Geirhos et al., 2020).
+    - > **while unsupervised pre-training has improved the quality of audio encoders dramatically, the lack of an equivalently high-quality pre-trained decoder, combined with a recommended protocol of dataset-specific fine-tuning, is a crucial weakness which limits their usefulness and robustness. The goal of a speech recognition system should be to work reliably “out of the box” in a broad range of environments without requiring supervised fine-tuning of a decoder for every deployment distribution.**
+  - Whisper:
+    - > speech recognition systems that are pre-trained in a supervised fashion across many datasets/domains exhibit higher robustness and generalize much more  effectively to held-out datasets than models trained on a single source.
+    - But even mixing several pre-existing labeled datasets leads to only ~5k hours of data.
+    - This can be increased by relaxing the requirement for gold-standard human-validated transcripts and relying on weak labels. *"This trade-off between quality and quantity is often the right call"*. But even here, prior work have led up to only ~30k hours of weakly supervised data.
+    - Whisper takes this much further by scaling to 680k hours of weakly labeled multilingual (97 languages) and multitask (X->en translation) data.
+    - > **Our work suggests that simple scaling of weakly supervised pre-training has been underappreciated so far for speech recognition. We achieve these results without the need for the self-supervision or self-training techniques that have been a mainstay of recent large-scale speech recognition work.**
+- **Method** (Fig 1):
+  - **Data Processing**: Faily minimalist approach.
+    - Text transcripts are not standardized/normalized removing the need for a separate inverse text normalization step, automated filtering methods to improve trascript quality, heuristics to detect and remove machine-generated transcripts from the training dataset, etc.
+    - Audio files chunked into 30-second segments.
+  - **Model**:
+    - Focus is on studying the capabilities of large-scale weakly supervised pre-training for ASR, not the model itself.
+    - Off-the-shelf transformer encoder-decoder architecture (Fig 1).
+    - Input audio resampled to 16 kHz, 80-channel log-mel spectrogram computed with 25ms window size and 10ms stride, followed .
+    - For English-only models, label text is processed via the same byte-level BPE tokenizer as in GPT-2 for English-only models.
+    - For multilingual models, as GPT-2 BPE tokenizer was fit only on English, using it as is will lead to "excessive fragmentation" (such as being broken down into the smallest possible units). Therefore, the tokenizer was refit on multilingual text, while keeping the vocabulary size the same (50k in the case of GPT-2).
+  - **Token Format for Multitask Modeling**:
+    - Text token format to facilitate performing multiple tasks such as transcription, translation, voice actitivity detection, language identification, alignment, etc.
+    - Allows for a single model to replace many different stages of a traditional speech processing pipeline
+    - See Fig 1 for token format spec.
+- **Experiments and Analysis**:
+  - Zero-shot evaluation on a wide-variety of existing speech processing datasets spanning domains, tasks, and languages.
+  - **On human-level performance**:
+    - > In 2015, Deep Speech 2 (Amodei et al., 2015) reported a speech recognition system matched human-level perfor- mance when transcribing the LibriSpeech test-clean split. As part of their analysis they concluded: “Given this result, we suspect that there is little room for a generic speech sys- tem to further improve on clean read speech without further domain adaptation.” Yet seven years later the SOTA WER on LibriSpeech test-clean has dropped another 73% from their 5.3% to 1.4% (Zhang et al., 2021), far below their re- ported human-level error rate of 5.8%. Despite this massive and unanticipated further improvement in performance on held-out but in-distribution data, speech recognition mod- els trained on LibriSpeech remain far above human error rates when used in other settings.  What explains this gap between reportedly superhuman performance in-distribution and subhuman performance out-of-distribution?
+    - > We suspect a large part of this gap between human and machine behavior is due to conflating different capabilities being measured by human and machine performance on a test set.  This claim may seem confusing at first; if both humans and machines are taking the same test, how can it be that different skills are being tested? The difference arises not in the testing but in how they trained for it. Humans are often asked to perform a task given little to no supervision on the specific data distribution being studied. Thus human performance is a measure of out-of-distribution generalization.  But machine learning models are usually evaluated after training on a large amount of supervision from the evaluation distribution, meaning that machine performance is instead a measure of in-distribution generalization. While both humans and machines are being evaluated on the same test data, two quite different abilities are being measured due to a difference in train data.
+    - > Whisper models, which are trained on a broad and diverse distribution of audio and evaluated in a zero-shot setting, could potentially match human behavior much better than existing systems. To study whether this is the case ... we can compare Whisper models with both human performance and standard fine-tuned machine learning models and check which they more closely match.
+    - > Although the best zero-shot Whisper model has a relatively unremarkable LibriSpeech clean-test WER of 2.5, ..., zero-shot Whisper models have very different robustness properties than supervised LibriSpeech models and out-perform all benchmarked Lib- riSpeech models by large amounts on other datasets.
+    - > **This finding suggests emphasizing zero-shot and out-of-distribution evaluations of models, particularly when attempting to compare to human performance, to avoid overstating the capabilities of machine learning systems due to misleading comparisons.**
+  - **On scaling**:
+    - > The general trend across tasks of diminishing returns when moving from 54,000 hours to our full dataset size of 680,000 hours could suggest that the current best Whisper models are under-trained relative to dataset size and performance could be further improved by a combination of longer training and larger models. It could also suggest that we are nearing the end of performance improvements from dataset size scaling for speech recognition. Further analysis is needed to characterize “scaling laws” for speech recognition in order to decided between these explanations."*
+  - **On general-purpose vs specialized models** (multilingual and multitask vs English-only ASR):
+    - > for small models trained with moderate amounts of compute, there is indeed negative transfer between tasks and languages: joint mod- els underperform English-only models trained for the same amount of compute. However, multitask and multilingual models scale better and for our largest experiments outperform their English-only counterparts demonstrating positive transfer from other tasks. For our largest experiments, joint models also slightly outperform English-only models even when not adjusting for compute spent per task.
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
