@@ -6,9 +6,9 @@
 
 ---
 
-- [ ] [2015] Deep Unsupervised Learning using Nonequilibrium Thermodynamics. <https://arxiv.org/abs/1503.03585>
-- [ ] [2020] Denoising Diffusion Probabilistic Models. <https://arxiv.org/abs/2006.11239>
-- [ ] [2022] The Annotated Diffusion Model. <https://huggingface.co/blog/annotated-diffusion>
+- [ ] [2015] Deep Unsupervised Learning using Nonequilibrium Thermodynamics — [paper](https://arxiv.org/abs/1503.03585)
+- [ ] [2020] Denoising Diffusion Probabilistic Models — [paper](https://arxiv.org/abs/2006.11239)
+- [ ] [2022] The Annotated Diffusion Model — [blog](https://huggingface.co/blog/annotated-diffusion)
 - [ ] TODO
 
 ## [2022] The Annotated Diffusion Model

@@ -6,17 +6,17 @@
 
 ---
 
-- [X] [2021] CLIP: Learning Transferable Visual Models From Natural Language Supervision. <https://arxiv.org/abs/2103.00020>
-- [ ] [2022] OpenCLIP: Reproducible scaling laws for contrastive language-image learning. <https://arxiv.org/abs/2212.07143>
+- [X] [2021] CLIP: Learning Transferable Visual Models From Natural Language Supervision — [paper](https://arxiv.org/abs/2103.00020)
+- [ ] [2022] OpenCLIP: Reproducible scaling laws for contrastive language-image learning — [paper](https://arxiv.org/abs/2212.07143)
   - [ ] OpenCLIP code: <https://github.com/mlfoundations/open_clip>
-- [X] [2023] MetaCLIP: Demystifying CLIP Data. <https://arxiv.org/abs/2309.16671>
-- [ ] [2022] RQ-Transformer: Autoregressive Image Generation using Residual Quantization. <https://arxiv.org/abs/2203.01941>
-- [ ] [2022] MaskGIT: Masked Generative Image Transformer. <https://arxiv.org/abs/2202.04200>
-- [ ] <https://arxiv.org/abs/2506.22355>
-- [ ] Cambrian (Saining): <https://cambrian-mllm.github.io/>, <https://arxiv.org/abs/2406.16860>
+- [X] [2023] MetaCLIP: Demystifying CLIP Data — [paper](https://arxiv.org/abs/2309.16671)
+- [ ] [2022] RQ-Transformer: Autoregressive Image Generation using Residual Quantization — [paper](https://arxiv.org/abs/2203.01941)
+- [ ] [2022] MaskGIT: Masked Generative Image Transformer — [paper](https://arxiv.org/abs/2202.04200)
+- [ ] [paper](https://arxiv.org/abs/2506.22355)
+- [ ] Cambrian (Saining): <https://cambrian-mllm.github.io/>, [paper](https://arxiv.org/abs/2406.16860)
 - [ ] TODO vision transformer (ViT)
 - [ ] SAM papers
-- [ ] Flamingo: a Visual Language Model for Few-Shot Learning. <https://arxiv.org/abs/2204.14198>
+- [ ] Flamingo: a Visual Language Model for Few-Shot Learning — [paper](https://arxiv.org/abs/2204.14198)
 
 ## [2021] CLIP: Learning Transferable Visual Models From Natural Language Supervision
 

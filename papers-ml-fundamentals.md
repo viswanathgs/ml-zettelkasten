@@ -7,33 +7,32 @@
 ---
 
 - [ ] [2014] Bahdanau, Neural machine translation by jointly learning to align and translate
-- [ ] [2015] Attention-Based Models for Speech Recognition. <https://arxiv.org/abs/1506.07503>
-- [X] [2016] Neural Machine Translation of Rare Words with Subword Units. <https://arxiv.org/abs/1508.07909>
-- [ ] [2017] Faiss: Billion-scale similarity search with GPUs. <https://arxiv.org/abs/1702.08734>
-- [ ] [2018] Subword Regularization: Improving Neural Network Translation Models with Multiple Subword Candidates <https://arxiv.org/abs/1804.10959>
-- [ ] Tokenizer: Byte-pair encoding (BPE, <https://arxiv.org/abs/1508.07909>) and SentencePiece (<https://github.com/google/sentencepiece>)
+- [ ] [2015] Attention-Based Models for Speech Recognition — [paper](https://arxiv.org/abs/1506.07503)
+- [X] [2016] Neural Machine Translation of Rare Words with Subword Units — [paper](https://arxiv.org/abs/1508.07909)
+- [ ] [2017] Faiss: Billion-scale similarity search with GPUs — [paper](https://arxiv.org/abs/1702.08734)
+- [ ] [2018] Subword Regularization: Improving Neural Network Translation Models with Multiple Subword Candidates — [paper](https://arxiv.org/abs/1804.10959)
+- [ ] Tokenizer: Byte-pair encoding (BPE, [paper](https://arxiv.org/abs/1508.07909)) and SentencePiece ([code](https://github.com/google/sentencepiece))
 - [ ] titoken
 - [ ] Attention is all you need
-- [ ] [2018] The Annotated Transformer. <https://nlp.seas.harvard.edu/annotated-transformer/>
-- [ ] [2020] Efficient Transformers: A Survey. <https://arxiv.org/abs/2009.06732>
-- [X] [2021] RASP: Thinking Like Transformers. <https://arxiv.org/abs/2106.06981>
-- [ ] [2020] Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning. <https://arxiv.org/abs/2012.13255>
-- [ ] [2020] Nucleus Sampling: The curious case of neural text degeneration. <https://arxiv.org/abs/1904.09751>
-- [X] [2020] [Patrick Lewis et al] RAG: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. <https://arxiv.org/abs/2005.11401>
-- [X] [2020] [Kelvin Guu et al] REALM: Retrieval-Augmented Language Model Pre-Training. <https://arxiv.org/abs/2002.08909>
-- [X] [2021] LoRA: Low-Rank Adaptation of Large Language Models. <https://arxiv.org/abs/2106.09685>
-- [ ] TODO QLoRA
-- [ ] [2024] LoRA Learns Less and Forgets Less. <https://arxiv.org/abs/2405.09673>
-- [ ] [2024] The Faiss library. <https://arxiv.org/abs/2401.08281>
+- [ ] [2018] The Annotated Transformer — [blog](https://nlp.seas.harvard.edu/annotated-transformer/)
+- [ ] [2020] Efficient Transformers: A Survey — [paper](https://arxiv.org/abs/2009.06732)
+- [X] [2021] RASP: Thinking Like Transformers — [paper](https://arxiv.org/abs/2106.06981)
+- [ ] [2020] Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning — [paper](https://arxiv.org/abs/2012.13255)
+- [ ] [2020] Nucleus Sampling: The curious case of neural text degeneration — [paper](https://arxiv.org/abs/1904.09751)
+- [X] [2020] [Patrick Lewis et al] RAG: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks — [paper](https://arxiv.org/abs/2005.11401)
+- [X] [2020] [Kelvin Guu et al] REALM: Retrieval-Augmented Language Model Pre-Training — [paper](https://arxiv.org/abs/2002.08909)
+- [X] [2021] LoRA: Low-Rank Adaptation of Large Language Models — [paper](https://arxiv.org/abs/2106.09685)
+- [ ] QLoRA
+- [ ] [2024] LoRA Learns Less and Forgets Less — [paper](https://arxiv.org/abs/2405.09673)
+- [ ] [2024] The Faiss library — [paper](https://arxiv.org/abs/2401.08281)
 - [ ] BERT
 - [ ] RLHF
 - [ ] FSDP
 - [ ] MoE
 - [ ] TODO gemini long context blog/report
-- [ ] TODO llama post-training internal primer <https://docs.google.com/document/d/1JajJ_5gwOFND7-cHh9pJnpuQ6BrDclh5dvFSB7N1UdE/edit?usp=sharing>
 - [ ] TODO RoPE
-- [ ] TODO GQA <https://arxiv.org/abs/2305.13245v1>
-- [ ] TODO Gumbel-Softmax trick: <https://sassafras13.github.io/GumbelSoftmax/>
+- [ ] TODO GQA — [paper](https://arxiv.org/abs/2305.13245v1)
+- [ ] TODO Gumbel-Softmax
 
 ## [2016] Neural Machine Translation of Rare Words with Subword Units
 

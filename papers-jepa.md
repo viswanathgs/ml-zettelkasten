@@ -7,6 +7,6 @@
 ---
 
 - [ ] Yann LeCun's position paper
-  - [ ] "A Path Towards Autonomous Machine Intelligence". <https://openreview.net/pdf?id=BZ5a1r-kVsf>
-  - [ ] LessWrong discussion on Yann's position paper: <https://www.lesswrong.com/posts/C5guLAx7ieQoowv3d/lecun-s-a-path-towards-autonomous-machine-intelligence-has-1>
+  - [ ] "A Path Towards Autonomous Machine Intelligence" — [paper](https://openreview.net/pdf?id=BZ5a1r-kVsf)
+  - [ ] LessWrong discussion on Yann's position paper — [blog](https://www.lesswrong.com/posts/C5guLAx7ieQoowv3d/lecun-s-a-path-towards-autonomous-machine-intelligence-has-1)
 - [ ] TODO

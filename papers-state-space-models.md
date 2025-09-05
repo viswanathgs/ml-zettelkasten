@@ -6,5 +6,5 @@
 
 ---
 
-- [X] Hazy Research Blog: From Deep to Long Learning <https://hazyresearch.stanford.edu/blog/2023-03-27-long-learning>
+- [X] Hazy Research Blog: From Deep to Long Learning — [blog](https://hazyresearch.stanford.edu/blog/2023-03-27-long-learning)
 - [ ] TODO

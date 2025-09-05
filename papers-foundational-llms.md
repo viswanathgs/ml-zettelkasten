@@ -6,8 +6,8 @@
 
 ---
 
-- [X] [2022] OPT: Open Pre-trained Transformer Language Models. <https://arxiv.org/abs/2205.01068>
-- [X] [2022] LLaMa: Open and Efficient Foundation Language Models. <https://arxiv.org/abs/2302.13971>
+- [X] [2022] OPT: Open Pre-trained Transformer Language Models — [paper](https://arxiv.org/abs/2205.01068)
+- [X] [2022] LLaMa: Open and Efficient Foundation Language Models — [paper](https://arxiv.org/abs/2302.13971)
 - [ ] [2023] Llama 2: Open Foundation and Fine-Tuned Chat Models
 - [ ] GPT 1-3
 - [ ] llama3

@@ -6,8 +6,8 @@
 
 ---
 
-- [ ] Beyond neural scaling laws: beating power law scaling via data pruning: <https://arxiv.org/abs/2206.14486>
-- [ ] T-MARS: Improving Visual Representations by Circumventing Text Feature Learning. <https://arxiv.org/abs/2307.03132>
-- [X] Datology premise: <https://blog.datologyai.com/introducing-datologyai-making-models-better-through-better-data-automatically/>
-- [X] CLIP improvement 1 (image-text): <https://blog.datologyai.com/productionized-multimodal-data-curation-at-the-billion-sample-scale/>
-- [X] CLIP improvement 2 (image-text, Ricardo): <https://blog.datologyai.com/multimodal-plus-blogpost/>
+- [ ] Beyond neural scaling laws: beating power law scaling via data pruning — [paper](https://arxiv.org/abs/2206.14486)
+- [ ] T-MARS: Improving Visual Representations by Circumventing Text Feature Learning — [paper](https://arxiv.org/abs/2307.03132)
+- [X] Datology premise — [blog](https://blog.datologyai.com/introducing-datologyai-making-models-better-through-better-data-automatically)
+- [X] CLIP improvement 1 (image-text) — [blog](https://blog.datologyai.com/productionized-multimodal-data-curation-at-the-billion-sample-scale)
+- [X] CLIP improvement 2 (image-text, Ricardo) — [blog](https://blog.datologyai.com/multimodal-plus-blogpost)
