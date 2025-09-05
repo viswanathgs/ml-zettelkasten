@@ -447,3 +447,13 @@
   - LoRA parameters: $\alpha = 16$ and $r = 8$.
 - Section 4: Cosine similarly between the audio embeddings (output of speech conformer followed by linear projection to match dimensionality) and the text embeddings (output of llama's `nn.Embedding` mapping text tokens to embeddings) shows monotonic similarity.
 - > The speech recognition task can be interpreted as a regurgitation task -- the language model is tasked with cleaning and repeating (in the same order) information that is present in the audio encoder output sequence.
+
+## [2024] Moshi: a speech-text foundation model for real-time dialogue
+
+- **Date**: 2025-09-05
+- **Arxiv**: <https://arxiv.org/abs/2410.00037>
+- **Paperpile**: <https://app.paperpile.com/view/?id=c7c6bc77-662f-4dae-a0bb-88f49c929788>
+
+---
+
+- TODO
