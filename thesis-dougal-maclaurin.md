@@ -1,4 +1,4 @@
-# Dougal MacLaurin's PhD Thesis
+# [Modeling, Inference and Optimization with Composable Differentiable Procedures, Dougal MacLaurin](https://dougalmaclaurin.com/phd-thesis.pdf)
 
 - **Created**: 2024-01-18
 - **Last Updated**: 2024-01-18
@@ -6,7 +6,7 @@
 
 ---
 
-- **Thesis**: [Modeling, Inference and Optimization with Composable Differentiable Procedures](https://dougalmaclaurin.com/phd-thesis.pdf)
+- **PhD Thesis**: <https://dougalmaclaurin.com/phd-thesis.pdf>
 - **Paperpile**: <https://app.paperpile.com/view/?id=30a08235-6959-4715-9117-4de7cf17f6db>
 
 ---

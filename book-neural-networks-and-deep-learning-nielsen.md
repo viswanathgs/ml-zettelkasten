@@ -1,12 +1,10 @@
-# Neural Networks and Deep Learning, Michael Nielsen
+# [Neural Networks and Deep Learning, Michael Nielsen](https://neuralnetworksanddeeplearning.com/)
 
 - **Created**: 2024-12-29
 - **Last Updated**: 2025-01-17
 - **Status**: `Done`
 
 ---
-
-**Book**: <https://neuralnetworksanddeeplearning.com/>
 
 - [X] Chapter 1: intro <https://neuralnetworksanddeeplearning.com/chap1.html>
   - [X] rabbithole: mathoverflow intuitive crutches for higher dimensional thinking: <https://mathoverflow.net/questions/25983/intuitive-crutches-for-higher-dimensional-thinking>

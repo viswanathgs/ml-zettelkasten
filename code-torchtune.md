@@ -1,12 +1,10 @@
-# torchtune
+# [pytorch/torchtune](https://github.com/pytorch/torchtune)
 
 - **Created**: 2024-04-16
 - **Last Updated**: 2024-04-16
 - **Status**: `Paused`
 
 ---
-
-**Code**: <https://github.com/pytorch/torchtune>
 
 - [ ] torchtune lib: pytorch/torchtune/torchtune/
   - [X] _cli

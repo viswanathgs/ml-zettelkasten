@@ -1,7 +1,7 @@
 # Speech/Audio
 
 - **Created**: 2025-07-16
-- **Last Updated**: 2025-09-03
+- **Last Updated**: 2025-09-05
 - **Status**: `In Progress`
 
 ---
