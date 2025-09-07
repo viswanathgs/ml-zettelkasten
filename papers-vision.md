@@ -1,8 +1,8 @@
 # Vision
 
 - **Created**: 2025-07-21
-- **Last Updated**: 2025-09-03
-- **Status**: `Paused`
+- **Last Updated**: 2025-09-06
+- **Status**: `In Progress`
 
 ---
 
@@ -10,8 +10,9 @@
 - [ ] [2022] OpenCLIP: Reproducible scaling laws for contrastive language-image learning — [paper](https://arxiv.org/abs/2212.07143)
   - [ ] OpenCLIP code: <https://github.com/mlfoundations/open_clip>
 - [X] [2023] MetaCLIP: Demystifying CLIP Data — [paper](https://arxiv.org/abs/2309.16671)
+- [ ] [2020] VQGAN: Taming Transformers for High-Resolution Image Synthesis - [paper](https://arxiv.org/abs/2012.09841)
 - [ ] [2022] RQ-Transformer: Autoregressive Image Generation using Residual Quantization — [paper](https://arxiv.org/abs/2203.01941)
-- [ ] [2022] MaskGIT: Masked Generative Image Transformer — [paper](https://arxiv.org/abs/2202.04200)
+- [X] [2022] MaskGIT: Masked Generative Image Transformer — [paper](https://arxiv.org/abs/2202.04200)
 - [ ] [paper](https://arxiv.org/abs/2506.22355)
 - [ ] Cambrian (Saining): <https://cambrian-mllm.github.io/>, [paper](https://arxiv.org/abs/2406.16860)
 - [ ] TODO vision transformer (ViT)
@@ -69,3 +70,60 @@
 
 - "We believe that the main ingredient to the success of CLIP is its data and not the model architecture or pre-training objective."
 - MetaCLIP (Metadata-Curated Language-Image Pretraining) aims to reveal CLIP's data curation process.
+
+## [2022] MaskGIT: Masked Generative Image Transformer
+
+- **Date**: 2025-05-09
+- **Arxiv**: <https://arxiv.org/abs/2202.04200>
+- **Paperpile**: <https://app.paperpile.com/view/?id=48910966-4885-4350-a09d-52e3e767c136>
+
+---
+
+- **Abstract**:
+  - > Generative transformers have experienced rapid popularity growth in the computer vision community in synthesizing high-fidelity and high-resolution images. The best generative transformer models so far, however, still treat an image naively as a sequence of tokens, and decode an image sequentially following the raster scan ordering (i.e., line-by-line). We find this strategy neither optimal nor efficient. This paper proposes a novel image synthesis paradigm using a bidirectional transformer decoder, which we term MaskGIT. During training, MaskGIT learns to predict randomly masked tokens by attending to tokens in all directions. At inference time, the model begins with generating all tokens of an image simultaneously, and then refines the image iteratively conditioned on the previous generation. Our experiments demonstrate that MaskGIT significantly outperforms the state-of-the-art transformer model on the ImageNet dataset, and accelerates autoregressive decoding by up to 64x. Besides, we illustrate that MaskGIT can be easily extended to various image editing tasks, such as inpainting, extrapolation, and image manipulation.
+- **Intro**:
+  - Inspired by the successs of autoregressive models (transformer, GPT) in NLP, **generative transformer models have received growing interests in image synthesis**.
+    - Generally, **autoregressive modeling for image generation is done in two stages**:
+      - **Stage 1**: Vector quantize an image into a sequence of discrete tokens.
+      - **Stage 2**: Train a transformer to generate the discrete tokens sequentially and autoregressively based on the previously generated tokens.
+    - Stage 1 gets most of the focus while Stage 2 is a drop in replacement from NLP.
+    - For Stage 2 (autoregressive modeling of discrete image tokens), **even SoTA methods treat an image naively as a flattened 1D sequence of tokens from left to right line-by-line (raster scan order)**.
+      - Neither optimal nor efficient. Unlike text, images are not sequential.
+  - **Masked Generative Image Transformer (MaskGIT)**:
+    - **Bidirectional transformer for image synthesis**.
+    - **Training (Fig 3)**: Similar to mask prediction in BERT.
+    - **Inference (Fig 2)**: A novel non-autoregressive decoding method to synthesize an image in constant number of steps. At each step, all tokens are predicted in parallel but only the most confident ones are kept for the next autoregressive step, with the remaining token masked out. The mask ratio is decreased until all tokens are generated with a few steps of refinement.
+      - Predicitons within each step are parallelizable.
+      - Order of magnitude faster decoding.
+      - For 32x32 image tokens, 8 steps with MaskGIT instead of 256 steps with raster scan order autoregressive decoding.
+      - Mask ratio scheduling (i.e., fraction of tokens masked at each step) significantly affects generation quality. Propose to use cosine schedule.
+    - > MaskGIT’s multidirectional nature makes it readily extendable to image manipulation tasks that are otherwise difficult for autoregressive models. Fig 1 shows a new application of class-conditional image  editing in which MaskGIT regenerates content inside the bounding box based on the given class while keeping the context (outside of the box) unchanged. This task, which is either infeasible for autoregressive model or difficult for GAN models, is trivial for our model.
+- **Method**:
+  - **Training (Fig 3)**:
+    - Stage 1 (image tokenization) uses the same setup as in VQGAN.
+    - Stage 2 (autoregressive modeling) learns a **bidirectional transformer with Masked Visual Token Modeling (MVTM)**.
+      - **(1) Tokenize**: Obtain discrete tokens by feeding the image to a VQ-encoder such as in VQGAN.
+      - **(2) Mask**: Sample a mask ratio $\gamma$ from 0 to 1, and uniformly select as many tokens to replace with `[MASK]`.
+      - **(3) Model**: Feed through a bi-directional tranformer to optimize with negative log-likelihood loss corresponding to the masked tokens.
+  - **Iterative Decoding (Fig 2)**: Start with a blank canvas with all the tokens masked out. Loop for $T$ steps:
+    - **(1) Predict**: Model inference to predict output token probabilities corresponding to masked positions.
+    - **(2) Sample**: At each masked position in the current step, sample an output token based on the predicted probabilities. The prediciton probability corresponding to the sampled output token is used as a confidence score, with the unmasked tokens in the current step receiving a confidence score of 1.0.
+    - **(3) Mask Schedule**: Using a mask scheduling function $\gamma(r)$ with $r \in [0,1)$, compute the number of tokens to mask at the current step: $n = \lceil \gamma(\frac{t}{T})N \rceil$, where $t$ is the current decoding step count, $T$ is the total number of decoding steps, and $N$ is the total number of tokens.
+    - **(4) Mask**: Mask $n$ of the least confident tokens according to the confidence score computed in (2).
+  - **Masking Design**: Significantly affects the quality of image generation.
+    - **Mask scheduling function** $\gamma(r)$ that computes the token mask ratio given an input $r \in [0,1]$.
+      - Inference: $r = t/T$, where $T$ is the total number of decoding steps and $t \in \{0, 1, 2, ..., T-1\}$ is the current decoding step.
+      - Training: $r$ is randomly sampled from $[0,1)$ to simulate various decoding scenarios.
+    - **Properties of mask scheduling function**:
+      - $\gamma(r)$ must be a continuous monotonically descreasing function wrt $r \in [0,1]$.
+      - $\gamma(0) \to 1$ (all tokens masked out at decoding step $t=0$).
+      - $\gamma(1) \to 0$ (all tokens unmasked at decoding step $t=T$).
+    - **Choices of mask scheduling function (Fig 8)**:
+      - Linear function
+      - Concave function (less to more tokens unmasked per step) - cosine, square, cubic, exponential
+      - Convex function (more to less tokens unmasked per step) - square root, logarithmic
+  - **Experiments**:
+    - **Metrics to measure image generation quality**: <https://chatgpt.com/share/68bce46c-3050-8005-906e-d4374a78d582>
+      - **Frechet Inception Distance (FID)**
+      - **Inception Score (IS)**
+    - Outperforms VQGAN in quality (owing to bidirectional nature), speed (parallelism of decoding), and versatility (extends to image inpainting/outpaintaing/editing beyond image synthesis).
