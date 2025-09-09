@@ -1,7 +1,7 @@
 # Vision
 
 - **Created**: 2025-07-21
-- **Last Updated**: 2025-09-06
+- **Last Updated**: 2025-09-05
 - **Status**: `In Progress`
 
 ---
@@ -102,14 +102,14 @@
   - **Training (Fig 3)**:
     - Stage 1 (image tokenization) uses the same setup as in VQGAN.
     - Stage 2 (autoregressive modeling) learns a **bidirectional transformer with Masked Visual Token Modeling (MVTM)**.
-      - **(1) Tokenize**: Obtain discrete tokens by feeding the image to a VQ-encoder such as in VQGAN.
-      - **(2) Mask**: Sample a mask ratio $\gamma$ from 0 to 1, and uniformly select as many tokens to replace with `[MASK]`.
-      - **(3) Model**: Feed through a bi-directional tranformer to optimize with negative log-likelihood loss corresponding to the masked tokens.
+      - **(i) Tokenize**: Obtain discrete tokens by feeding the image to a VQ-encoder such as in VQGAN.
+      - **(ii) Mask**: Sample a mask ratio $\gamma$ from 0 to 1, and uniformly select as many tokens to replace with `[MASK]`.
+      - **(iii) Model**: Feed through a bi-directional tranformer to optimize with negative log-likelihood loss corresponding to the masked tokens.
   - **Iterative Decoding (Fig 2)**: Start with a blank canvas with all the tokens masked out. Loop for $T$ steps:
-    - **(1) Predict**: Model inference to predict output token probabilities corresponding to masked positions.
-    - **(2) Sample**: At each masked position in the current step, sample an output token based on the predicted probabilities. The prediciton probability corresponding to the sampled output token is used as a confidence score, with the unmasked tokens in the current step receiving a confidence score of 1.0.
-    - **(3) Mask Schedule**: Using a mask scheduling function $\gamma(r)$ with $r \in [0,1)$, compute the number of tokens to mask at the current step: $n = \lceil \gamma(\frac{t}{T})N \rceil$, where $t$ is the current decoding step count, $T$ is the total number of decoding steps, and $N$ is the total number of tokens.
-    - **(4) Mask**: Mask $n$ of the least confident tokens according to the confidence score computed in (2).
+    - **(i) Predict**: Model inference to predict output token probabilities corresponding to masked positions.
+    - **(ii) Sample**: At each masked position in the current step, sample an output token based on the predicted probabilities. The prediciton probability corresponding to the sampled output token is used as a confidence score, with the unmasked tokens in the current step receiving a confidence score of 1.0.
+    - **(iii) Mask Schedule**: Using a mask scheduling function $\gamma(r)$ with $r \in [0,1)$, compute the number of tokens to mask at the current step: $n = \lceil \gamma(\frac{t}{T})N \rceil$, where $t$ is the current decoding step count, $T$ is the total number of decoding steps, and $N$ is the total number of tokens.
+    - **(iv) Mask**: Mask $n$ of the least confident tokens according to the confidence score computed in (2).
   - **Masking Design**: Significantly affects the quality of image generation.
     - **Mask scheduling function** $\gamma(r)$ that computes the token mask ratio given an input $r \in [0,1]$.
       - Inference: $r = t/T$, where $T$ is the total number of decoding steps and $t \in \{0, 1, 2, ..., T-1\}$ is the current decoding step.

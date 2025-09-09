@@ -1,7 +1,7 @@
 # Speech/Audio
 
 - **Created**: 2025-07-16
-- **Last Updated**: 2025-09-05
+- **Last Updated**: 2025-09-09
 - **Status**: `In Progress`
 
 ---
@@ -14,7 +14,7 @@
 - [X] [2021] SoundStream: An End-to-End Neural Audio Codec - [paper](https://arxiv.org/abs/2107.03312)
 - [X] [2022] EnCodec: High Fidelity Neural Audio Compression - [paper](https://arxiv.org/abs/2210.13438)
 - [X] [2022] AudioLM: a Language Modeling Approach to Audio Generation - [paper](https://arxiv.org/abs/2209.03143)
-- [ ] [2023] SoundStorm: Efficient Parallel Audio Generation - [paper](https://arxiv.org/abs/2305.09636)
+- [X] [2023] SoundStorm: Efficient Parallel Audio Generation - [paper](https://arxiv.org/abs/2305.09636)
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen - [paper](https://arxiv.org/abs/2306.12925)
 - [X] [2023] MusicGen: Simple and Controllable Music Generation - [paper](https://arxiv.org/abs/2306.05284)
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities - [paper](https://arxiv.org/abs/2307.11795)
@@ -325,27 +325,51 @@
 
 ## [2023] SoundStorm: Efficient Parallel Audio Generation
 
-- **Date**: 2025-08-27
+- **Date**: 2025-09-09
 - **Arxiv**: <https://arxiv.org/abs/2305.09636>
 - **Paperpile**: <https://app.paperpile.com/view/?id=b6a32e14-6a86-4bce-bfed-888e152d13c4>
 
 ---
 
 - **Intro**:
-  - AudioLM's autoregressive decoding process is too slow for audio generation. For generating high-quality audio by modeling the tokens of a neural codec (such as SoundStream), the rate of the discrete tokens should be high, resulting in either an exponential growth in codebook size or in long token sequences. For attention-based models, runtime complexity is quadradic wrt sequence length, leading to tradeoff between perception quality of the generated audio and runtime.
-  - Three orthogonal approaches to combat the problem of generating long audio token sequences:
+  - AudioLM's **autoregressive decoding is too slow for audio generation**.
+    - For generating high-quality audio by modeling the tokens of a neural codec (such as SoundStream), the rate of the discrete tokens should be high, resulting in either an exponential growth in codebook size or in long token sequences.
+    - For attention-based models, runtime complexity is quadradic wrt sequence length, leading to tradeoff between perception quality of the generated audio and runtime.
+  - **Three orthogonal approaches to combat the problem of generating long audio token sequences**:
     - (a) efficient attention mechanisms,
-    - (b) non-autoregressive parallel decoding schemes,
-    - (c) custom architectures adapted to the special structure of tokens produced by neural audio codec (such as relying on RVQ's hierachical structure in SoundStream and AudioLM).
-      - > We believe that it is the special structure of the audio token sequence that holds the most promise for future advances in long-sequence audio modeling. Concretely, both Sound- Stream (Zeghidour et al., 2022) and EnCodec (D ́efossez et al., 2022) rely on Residual Vector Quantization (RVQ), where each compressed audio frame is quantized by a series of quantizers, with each quantizer operating on the residual of the previous one, and the number of quantizers control- ling the overall bitrate.  This induces a hierarchical token structure, where tokens from finer RVQ levels contribute less to the perceptual quality, allowing for efficient factor- izations and approximations of the joint distribution of the token sequence. Hence, the models and decoding schemes should take this special structure of the input into account for efficient training and inference.
-  - SoundStorm improves efficiency of generating long audio token sequences by relying on:
-    - **(i) an architecture adapted to the hierarchical structure of audio tokens**,
-    - **(ii) a parallel, non-autoregressive, confidence-based decoding scheme inspired by MaskGIT** for residual vector quantized (RVQ) token sequences.
-- TODO
+    - (b) non-autoregressive **parallel decoding schemes such as MaskGIT** [[papers-vision.md]],
+    - (c) custom **architectures adapted to the special structure of audio tokens such as hierarchical SoundStream RVQ codes**.
+      - > We believe that it is the special structure of the audio token sequence that holds the most promise for future advances in long-sequence audio modeling. Concretely, both SoundStream (Zeghidour et al., 2022) and EnCodec (Defossez et al., 2022) rely on Residual Vector Quantization (RVQ), where each compressed audio frame is quantized by a series of quantizers, with each quantizer operating on the residual of the previous one, and the number of quantizers controlling the overall bitrate. This induces a hierarchical token structure, where tokens from finer RVQ levels contribute less to the perceptual quality, allowing for efficient factorizations and approximations of the joint distribution of the token sequence. Hence, the models and decoding schemes should take this special structure of the input into account for efficient training and inference.
+  - **SoundStorm's improvements over AudioLM**:
+    - Improves efficiency of AudioLM's generation process by relying on approaches (b) parallel decoding and (c) leveraging hierarchical nature of acoustic tokens.
+    - AudioLM's Stage 1 (semantic modeling) and conditioning the acoustic tokens on semantic tokens (k-means clustered SSL pretrained audio representations) remain the same.
+    - But, replaces the sequential Stage 2 (coarse acoustic modeling) and Stage 3 (fine acoustic modeling) of AudioLM with MaskGIT-inspired parallel decoding process of acoustic tokens (SoundStream RVQ codes).
+    - To achieve the above, uses a bidirectional conformer trained to predict masked acoustic tokens conditioned on semantic tokens.
+    - > On the input side, it sums up the embeddings of the tokens corresponding to the same SoundStream frame, such that the internal sequence length for the self-attention is identical to the number of SoundStream frames, and independent of the number of quantizers in the RVQ. The output embeddings are then processed by separate heads per RVQ level to predict the masked target tokens.
+    - During inference, given the semantic tokens to condition on, SoundStorm **starts with all acoustic tokens masked out, and unmasks them RVQ level-by-level over multiple steps, predicting multiple tokens in parallel per step within a level**. During training, a masking scheme is to support this inference scheme.
+    - Two orders-of-magnitude faster than AudioLM's acoustic token generation.
+- **Method**:
+  - **Architecture (Fig 1)**:
+    - > we interleave the time-aligned conditioning tokens with the SoundStream tokens at the frame level, embed the resulting sequence, sum the embeddings corresponding to the same frame, including the embedding of the conditioning token, and pass the resulting continuous embeddings to a Conformer.
+    - > Consequently, the sequence length for bidirectional self-attention in the Conformer is determined by the number of SoundStream frames (typically 50 per second), and thus is independent of the number of RVQ levels $Q$.
+    - > At the output side, we use $Q$ dense layers as heads to produce the target SoundStream tokens.
+  - **Masking (Fig 1)**:
+    - **MaskGIT-style masking and parallel decoding per RVQ level in a coarse-to-fine order**.
+    - **Training-time masking scheme** to mimic the decoding procedure during inference.
+      - (i) Semantic tokens (to condition acoustic tokens on) are never masked.
+      - (ii) To enable voice prompting, randomly sample a timestep $t \in {1,...,T}$ and all tokens before this timestep are not masked.
+      - (iii) Randomly sample RVQ level $q \in {1,...,Q}$.
+      - (iv) For timestep $> t$, mask all acoustic tokens corresponding to RVQ level $> q$.
+      - (v) For timestep $> t$, sample and apply mask for acoustic tokens corresponding to RVQ level $q$ per cosine mask scheduling function as in MaskGIT [[papers-vision.md]].
+    - **Cross-entropy loss calculated only on the masked tokens within RVQ level $q$** sampled at Step (iii) to ensure conditional dependency arising from the hierarchical nature of RVQ levels.
+  - **Iterative Parallel Decoding (MaskGIT-inspired)**:
+    - Given semantic tokens to condition on, start with all SoundStream acoustic tokens masked out (except for those corresponding to any provided prompt).
+    - Sample acoustic tokens RVQ level-wise in a coarse-to-fine order, only proceeding to level $q + 1$ when all tokens at levels ${1,...q}$ are unmasked.
+    - Within each RVQ level $q$, MaskGIT's confidence-based sampling scheme following a cosine-schedule is applied over multiple steps of parallel decoding.
 - **Lineage**: <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
   - **(1) SoundStream**: Foundational codec for discrete tokenization detokenization of audio.
   - **(2) AudioLM**: Train autoregressive generative LM over discrete audio tokens.
-  - **(3) SoundStorm**: Efficiency improvement over the slow autoregressive decoding process of AudioLM.
+  - **(3) SoundStorm**: Efficiency improvement over the slow sequential acoustic token decoding process of AudioLM via a parallel decoding process inspired by MaskGIT [[papers-vision.md]].
 
 ## [2023] AudioPaLM: A Large Language Model That Can Speak and Listen
 
@@ -387,7 +411,7 @@
 - **Lineage**: <https://chatgpt.com/share/68af5b20-4658-8005-9c83-8ee9afe52c2d>
   - **(1) SoundStream**: Foundational codec for discrete tokenization detokenization of audio.
   - **(2) AudioLM**: Train autoregressive generative LM over discrete audio tokens.
-  - **(3) SoundStorm**: Efficiency improvement over the slow autoregressive decoding process of AudioLM.
+  - **(3) SoundStorm**: Efficiency improvement over the slow sequential acoustic token decoding process of AudioLM via a parallel decoding process inspired by MaskGIT [[papers-vision.md]].
   - **(4) AudioPaLM**: Merges AudioLM (speech-only LM) with PaLM-2 (text-only LM) by unifying the audio and text vocabularies into a single multimodal vocabulary. Allows for training a single model in both directions, arbitrary interleaving of speech and text, and enables a single model to do ASR, TTS, speech-to-speech translation, etc.
 
 ## [2023] MusicGen: Simple and Controllable Music Generation
