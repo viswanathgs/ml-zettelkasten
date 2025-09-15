@@ -11,7 +11,7 @@
   - [ ] OpenCLIP code: <https://github.com/mlfoundations/open_clip>
 - [X] [2023] MetaCLIP: Demystifying CLIP Data — [paper](https://arxiv.org/abs/2309.16671)
 - [ ] [2020] VQGAN: Taming Transformers for High-Resolution Image Synthesis - [paper](https://arxiv.org/abs/2012.09841)
-- [ ] [2022] RQ-Transformer: Autoregressive Image Generation using Residual Quantization — [paper](https://arxiv.org/abs/2203.01941)
+- [X] [2022] RQ-VAE & RQ-Transformer: Autoregressive Image Generation using Residual Quantization — [paper](https://arxiv.org/abs/2203.01941)
 - [X] [2022] MaskGIT: Masked Generative Image Transformer — [paper](https://arxiv.org/abs/2202.04200)
 - [ ] [paper](https://arxiv.org/abs/2506.22355)
 - [ ] Cambrian (Saining): <https://cambrian-mllm.github.io/>, [paper](https://arxiv.org/abs/2406.16860)
@@ -70,6 +70,50 @@
 
 - "We believe that the main ingredient to the success of CLIP is its data and not the model architecture or pre-training objective."
 - MetaCLIP (Metadata-Curated Language-Image Pretraining) aims to reveal CLIP's data curation process.
+
+## [2022] RQ-VAE & RQ-Transformer: Autoregressive Image Generation using Residual Quantization
+
+**Date**: 2025-09-11
+**Arxiv**: <https://arxiv.org/abs/2203.01941>
+**Paperpile**: <https://app.paperpile.com/view/?id=ae51403e-e299-414c-9fd2-46f6fa0272ea>
+
+---
+
+- **Abstract**:
+  - > For autoregressive (AR) modeling of high-resolution images, vector quantization (VQ) represents an image as a sequence of discrete codes. A short sequence length is important for an AR model to reduce its computational costs to consider long-range interactions of codes. However, we postulate that previous VQ cannot shorten the code sequence and generate high-fidelity images together in terms of the rate-distortion trade-off. In this study, we propose the two-stage framework, which consists of Residual-Quantized VAE (RQ-VAE) and RQ-Transformer, to effectively generate high-resolution images. Given a fixed codebook size, RQ-VAE can precisely approximate a feature map of an image and represent the image as a stacked map of discrete codes. Then, RQ-Transformer learns to predict the quantized feature vector at the next position by predicting the next stack of codes. Thanks to the precise approximation of RQ-VAE, we can represent a 256× 256 image as 8× 8 resolution of the feature map, and RQ-Transformer can efficiently reduce the computational costs. Consequently, our framework outperforms the existing AR models on various benchmarks of unconditional and conditional image generation. Our approach also has a significantly faster sampling speed than previous AR models to generate high-quality images.
+- **Intro**:
+  - Vector Quantization (VQ) is fundamental for enabling autoregressive (AR) models to generate high resolution images.
+    - VQ takes an image and outputs a sequence of discrete codes/tokens, which are flattened in raster-scan order and used to train an autoregressive next-token-prediction model.
+  - **Trade-off in terms of sequence length of discrete codes/tokens for AR image-generation models**:
+    - Long sequence length -> computational inefficiency of AR model.
+    - Short sequence length -> **rate-distortion trade-off**.
+      - > VQ-VAE requires an exponentially increasing size of codebook to reduce the resolution of the quantized feature map, while conserving the quality of reconstructed images. However, a huge codebook leads to the increase of model parameters and the codebook collapse problem, which makes the training of VQ-VAE unstable.
+  - **Contributions**:
+    - **(1) RQ-VAE**: VQ-VAE with Residual VQ instead of standard VQ; helps reduce token sequence length without compromising reconstruction quality or needing to exponentially increase the codebook size.
+    - **(2) RQ-Transformer**: Autoregressive next-token prediction adapted to RVQ codes (predict tokens corresponding to all RVQ levels at once per timestep).
+- **Methods**:
+  - **(1) RQ-VAE (Residual Quantized VAE)**:
+    - Replaces VQ in VQ-VAE with RVQ (Residual Vector Quantizer). See SoundStream [[papers-speech.md]].
+    - **Helps reduce spatial resolution of the vector-quantized feature map** for AR modeling without needing to exponentially grow the codebook size to combat loss in approximation.
+    - In this work, a single shared codebook is shared across all $Q$ levels of RVQ instead of one codebook per level.
+    - **RQ-VAE Loss $L_{RQ-VAE} = L_{reconstruction} + \alpha L_{commitment}$**
+      - **(a) Reconstruction loss** $L_{reconstruction} = \lVert X - \hat{X} \rVert^2_2$, where $X$ is the original image and $\hat{X}$ is the reconstructed image.
+      - **(b) Commitment loss** $L_{commitment} = \sum_{q=1}^{Q} \lVert Z - \hat{Z}_q.\text{detach()} \rVert^2_2$, where $Z$ is the latent representation before quantization and $\hat{Z}_q$ is the reconstructed latent representation corresponding to RVQ level $q$.
+        - cf. commitment loss in vq-wav2vec [[papers-speech.md]] for a slight difference in formulation.
+        - > Note that $L_{commitment}$ is the sum of quantization errors from every $q$, not a single term $\lVert Z - \hat{Z}\rVert^2_2$. It aims to make $\hat{Z}_q$ sequentially decrease the quantization error of $Z$ as $q$ increases. Thus, RQ-VAE approximates the feature map in a coarse-to-fine manner and keeps the training stable.
+        - $\hat{Z}_q.\text{detach()}$ is the straight-through estimator (STE) application to bypass the non-differentiable codebook lookup step.
+        - **Codebook entries are updated via EMA** (exponential moving average) as in SoundStream [[papers-speech.md]] and <https://github.com/viswanathgs/emg-codec> (`vector_quantizer.VectorQuantizer._update_codebook`).
+  - **(2) RQ-Transformer** (Fig 2):
+    - **Input**: Discrete codes/tokens from RQ-VAE of shape $H \times W \times Q$.
+    - **Naive approach**: Autoregressive modeling over 1D flattened sequence of codes. **$H \times W \times $Q$ autoregressive steps**.
+    - **RQ-Transformer**: Autoregressive modeling factorized across spatial ($H \times W$) and depth ($Q$) dimensions. **$H \times W + Q$ autoregressive steps** with the depth transformer executing in parallel over all spatial points.
+      - **(a) Spatial Transformer**: Sum the quantized latent representations for all quantizer levels $q \in \{1,...Q\}$ per spatial timestep $t \in \{1,...,H \times W\}$, feed into a transformer that autoregressively outputs a latent per timestep $t$ to be fed into the depth transformer. **$H \times W$ autoregressive steps**.
+      - **(b) Depth Transformer**: In parallel over all spatial timesteps $t \in \{1,...,H \times W\}$, take the output latent from spatial transformer corresponding to that timestep and autoregressively predict output codes for each depth (quantization level) $q \in \{1,...Q\}$. **$Q$ parallel autoregressive steps**.
+    - The **reduced spatial resolution of RVQ feature map codes improves computational efficiency and helps learn long-range interactions**.
+    - **Strategies to mitigate exposure bias**:
+      - > Exposure bias is known to deteriorate the perfor mance of an AR model due to the error accumulation from the discrepancy of predictions in training  and inference. During an inference of RQ-Transformer, the prediction errors can also accumulate along with the quantization level/depth $Q$, since finer estimation of the feature vector becomes harder as $q$ increases.
+      - **(i) Soft Labeling of Target Codes (Training-time)**: Instead of treating the chosen codebook entry as a hard one-hot target for RQ-Transformer training, use a soft label distribution over the nearest few codebook entries, but annealed with a temperature paper so that this approaches the hard one-hot target as training progresses. Fixes training stability and encourages robust codebook usage.
+      - **(ii) Stochastic Sampling for Codes of RQ-VAE (Inference-time)**: Similarly, temperature sampling codes to feed into RQ-Transformer during inference. Improves inference diversity and prevents collapse to dull generations.
 
 ## [2022] MaskGIT: Masked Generative Image Transformer
 

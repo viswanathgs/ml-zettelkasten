@@ -21,3 +21,4 @@
 - [ ] [2025] [ICLR] Yi Ma, Pursuing the Nature of Intelligence, <https://iclr.cc/virtual/2025/invited-talk/36785>
 - [ ] [2025] [ICLR] Tim Rocktaschel ICLR, Open-Endedness, World Models, and the Automation of Innovation, <https://iclr.cc/virtual/2025/invited-talk/36780>
 - [ ] [2025] Shuchao Bi, Advancing the Frontier of Silicon Intelligence: the Past, Open Problems, and the Future, <https://www.youtube.com/watch?v=E22AOHAEtu4>
+- [ ] [2025] [Hot Chips] Noam Shazeer, Predictions for the Next Phase of AI, <https://www.youtube.com/watch?v=v0beJQZQIGA>

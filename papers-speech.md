@@ -21,6 +21,8 @@
 - [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue - [paper](https://arxiv.org/abs/2410.00037)
 - [X] [2025] Sesame AI Conversational Speech Model - [blog](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice)
 
+---
+
 ## [2019] wav2vec: Unsupervised Pre-training for Speech Recognition
 
 - **Date**: 2025-08-13
@@ -83,7 +85,7 @@
       - During forward pass, pick the codebook entry $\tilde{z}$ corresponding to the largest $p$. This non-differentiable step is still needed as we don't want a weighted sum of codebook entries, but strictly want to select a single codebook entry.
       - During backward pass, the usage of straight-through estimator (STE) enables gradient flow from the chosen $\tilde{z}$ to the distribution $p$. The actual implementation can be formulated as going from $p$ to argmax one-hot, and then applying STE to bypass the non-differentiable argmax op$:
         - $p_{\text{onehot}} = \text{onehot}(\text{argmax}_j p_j)$
-        - $p_{\text{onehot}} = (p_{\text{onehot}} - p).\text{detach}() + p$
+        - $p_{\text{onehot}} = (p_{\text{onehot}} - p).\text{detach()} + p$
         - $\tilde{z} = \text{codebook}[p_{\text{onehot}}]$
     - **Inference**:
       - We simply pick the codebook entry corresponding to the largest index in $l$.
@@ -93,7 +95,7 @@
     - Unlike in Gumbel-Softmax, the above codebook lookup step is not differentiable anymore.
     - **Loss $L_{vq-wav2vec}^{kmeans} = L_{wav2vec} + L_{codebook} + L_{commitment}$**
       - **wav2vec loss**: $L_{wav2vec}$ is the same as wav2vec loss except that the context network predicts the quantized latent $\tilde{Z}$, and straight-through estimator (STE) is used to backprop all the way.
-      - **Codebook and commitment losses**: $L_{codebook} + L_{commitment} = \|z.\text{detach}() - \tilde{z}\|^2 + \|z - \tilde{z}.\text{detach}()\|^2$.
+      - **Codebook and commitment losses**: $L_{codebook} + L_{commitment} = \|z.\text{detach()} - \tilde{z}\|^2 + \|z - \tilde{z}.\text{detach()}\|^2$.
         - The first term (codebook loss) updates the chosen codebook entry $\tilde{z}$ to be closer to the frozen encoder representation $z$ (frozen due to stop-gradient).
         - The second term (commitment loss) updates the encoder output $z$ towards the chosen (and frozen) codebook vector $\tilde{z}$, forcing the encoder to "commit" to a codebook entry.
         - This separation is more stable and avoids collapse rather than having a single $\|z - \tilde{z}\|^2$ term: <https://chatgpt.com/c/689e8361-ac38-8329-91b9-3d958b282100>
@@ -239,10 +241,10 @@
   - "Quantizer dropout" helps the model handle different bitrates.
   - Compared to mel-spectrogram features, the learned encoder had much better coding efficiency.
 - **Residual Vector Quantizer (RVQ)**:
-  - Goal: Compress the output of the encoder $\text{enc}(x) \in \mathbb{R}^{T \times D}$ to a target bitrate of $R$ bits per second (bps).
+  - **Goal**: Compress the output of the encoder $\text{enc}(x) \in \mathbb{R}^{T \times D}$ to a target bitrate of $R$ bits per second (bps).
   - Naive Vector Quantizer (VQ) will lead to a prohibitively large codebook size. For example, if the target bitrate $R$ is 5000 bps, and the encoder output is at 50Hz (50 frames/sec), then this corresponds to 5000/50 = 100 bits allocated to each frame. This would mean a codebook / lookup table size of $2^{100}$ entries.
   - On the other hand, with Residual Vector Quantizer (RVQ), the same 100 bits for each frame can be allocated by using $N_q = 10$ vector quantizers to sequentially quantize the residuals, each with a codebook size of $2^{10}$ entries (much more manageable).
-  - The codebook is initialized with k-means of the first batch embeddings and then updated using exponential moving average (rather than backprop): <https://chatgpt.com/share/689cad67-5ff4-8005-b471-7de54dc8f206>
+  - The codebook is initialized with k-means of the first batch embeddings and then updated using exponential moving average (EMA) rather than backprop: <https://chatgpt.com/share/689cad67-5ff4-8005-b471-7de54dc8f206>
     - > The codebook of each quantizer is trained with exponential moving  average  updates,  following  the  method  proposed  in VQ-VAE-2 [32]. To improve the usage of the codebooks we use two additional methods. First, instead of using a random initialization  for  the  codebook  vectors,  we  run  the  k-means algorithm  on  the  first  training  batch  and  use  the  learned centroids  as  initialization.  This  allows  the  codebook  to  be close to the distribution of its inputs and improves its usage. Second, as proposed in [34], when a codebook vector has not been assigned any input frame for several batches, we replace it with an input frame randomly sampled within the current batch. More precisely, we track the exponential moving average of the assignments to each vector (with a decay factor of 0.99) and replace the vectors of which this statistic falls below 2.
 - **Quantizer dropout to build a single model that works for different bitrates**:
   - > Since the vector quantizers are trained jointly with the encoder/decoder, in principle a different SoundStream model should be trained for each target bitrate. Instead, having a single bitrate scalable model that can operate at several target bitrates is much more practical, since this reduces the memory footprint needed to store model parameters both at the encoder and decoder side.
@@ -250,11 +252,11 @@
   - During training, quantizer dropout is applied as above. During inference, for a target bitrate, we choose the required number of the first $n_q$ quantizers.
   - > A key advantage of our residual vector quantizer is that the dimensionality of the embeddings does not change with the bitrate. Indeed, the additive composition of  the  outputs  of  each  VQ  layer  progressively  refines  the quantized embeddings, while keeping the same shape. Hence, no architectural changes are needed in neither the encoder nor the decoder to accommodate different bitrates
 - **Training objective**:
-  - Definitions:
-    - Generator: Soundstream generator $G(x) = dec(Q(enc(x)))$ takes the waveform $x$ through the encoder, the quantizer and the decoder.
+  - **Definitions**:
+    - **Generator** $G(x) = dec(Q(enc(x)))$ takes the waveform $x$ through the encoder, the quantizer and the decoder.
     - $\hat{x} = G(x)$ is the reconstructed waveform.
-    - Discriminator: $D(x)$ is the discriminator trained to distinguish between the original $x$ and the reconstructed $\hat{x}$ audio.
-  - Loss $L = L_{D} + L_{G}^{adversarial} + L_{G}^{reconstruction}$
+    - **Discriminator** $D(x)$ is trained to distinguish between the original $x$ and the reconstructed $\hat{x}$ audio.
+  - **Loss $L = L_{D} + L_{G}^{adversarial} + L_{G}^{reconstruction}$**
     - **Reconstruction loss** $L_{G}^{reconstruction}$: L1 or L2 loss between the spectrograms of the original $x$ and decoded $\hat{x}$ audio.
     - **Adversarial loss** $L_{G}^{adversarial}$: Hinge loss forcing the generator to produce outputs that the discriminator classifies as "real" (+1) and not as "fake" (-1). $\max(0, 1 - D(G(x)))$.
       - **Hinge loss**: Used for maximum margin classification (such as in SVM). $L(y') = \max(0, 1 - y \cdot y')$, where $y$ is the ground-truth class (either +1 or -1), and $y'$ is the predicted logit ("raw" output of the classifier's decision function, not the predicted class label). When $y$ and $y'$ have the same sign (meaning y predicts the right class) and $|y'| \geq 1$ (correct class prediction and enough margin), the loss is 0. When they have the same sign, but $|y'| < 1$ (correct class prediction, but not enough margin), the loss decreases linearly with $y'$. When they have opposite signs (incorrect class prediction), the loss increases linearly with $y'$. <https://en.wikipedia.org/wiki/Hinge_loss>.
@@ -357,8 +359,8 @@
     - **MaskGIT-style masking and parallel decoding per RVQ level in a coarse-to-fine order**.
     - **Training-time masking scheme** to mimic the decoding procedure during inference.
       - (i) Semantic tokens (to condition acoustic tokens on) are never masked.
-      - (ii) To enable voice prompting, randomly sample a timestep $t \in {1,...,T}$ and all tokens before this timestep are not masked.
-      - (iii) Randomly sample RVQ level $q \in {1,...,Q}$.
+      - (ii) To enable voice prompting, randomly sample a timestep $t \in \{1,...,T\}$ and all tokens before this timestep are not masked.
+      - (iii) Randomly sample RVQ level $q \in \{1,...,Q\}$.
       - (iv) For timestep $> t$, mask all acoustic tokens corresponding to RVQ level $> q$.
       - (v) For timestep $> t$, sample and apply mask for acoustic tokens corresponding to RVQ level $q$ per cosine mask scheduling function as in MaskGIT [[papers-vision.md]].
     - **Cross-entropy loss calculated only on the masked tokens within RVQ level $q$** sampled at Step (iii) to ensure conditional dependency arising from the hierarchical nature of RVQ levels.
