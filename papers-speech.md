@@ -1,7 +1,7 @@
 # Speech/Audio
 
 - **Created**: 2025-07-16
-- **Last Updated**: 2025-09-09
+- **Last Updated**: 2025-09-22
 - **Status**: `In Progress`
 
 ---
@@ -172,7 +172,7 @@
 - **Date**: 2025-09-03
 - **Arxiv**: <https://arxiv.org/abs/2212.04356>
 - **Paperpile**: <https://app.paperpile.com/view/?id=170c2958-cbd1-41de-a6cc-8ef0fc1ee507>
-- **Code**: <https://github.com/openai/whisper>
+- **Code**: <https://github.com/openai/whisper> [[code-whisper.md]]
 
 ---
 
@@ -195,7 +195,9 @@
   - **Model**:
     - Focus is on studying the capabilities of large-scale weakly supervised pre-training for ASR, not the model itself.
     - Off-the-shelf transformer encoder-decoder architecture (Fig 1).
-    - Input audio resampled to 16 kHz, 80-channel log-mel spectrogram computed with 25ms window size and 10ms stride, followed .
+      - **Audio Preprocessing**: Input audio resampled to 16 kHz, 80-channel log-mel spectrogram computed with 25ms window size and 10ms stride.
+      - **Audio Encoder**: Self-attention blocks over preprocessed audio to output audio embeddings.
+      - **Text Decoder**: Autoregressive next-token prediction with cross-attention to the audio embeddings output by the audio encoder.
     - For English-only models, label text is processed via the same byte-level BPE tokenizer as in GPT-2 for English-only models.
     - For multilingual models, as GPT-2 BPE tokenizer was fit only on English, using it as is will lead to "excessive fragmentation" (such as being broken down into the smallest possible units). Therefore, the tokenizer was refit on multilingual text, while keeping the vocabulary size the same (50k in the case of GPT-2).
   - **Token Format for Multitask Modeling**:
@@ -213,7 +215,7 @@
   - **On scaling**:
     - > The general trend across tasks of diminishing returns when moving from 54,000 hours to our full dataset size of 680,000 hours could suggest that the current best Whisper models are under-trained relative to dataset size and performance could be further improved by a combination of longer training and larger models. It could also suggest that we are nearing the end of performance improvements from dataset size scaling for speech recognition. Further analysis is needed to characterize “scaling laws” for speech recognition in order to decided between these explanations."*
   - **On general-purpose vs specialized models** (multilingual and multitask vs English-only ASR):
-    - > for small models trained with moderate amounts of compute, there is indeed negative transfer between tasks and languages: joint mod- els underperform English-only models trained for the same amount of compute. However, multitask and multilingual models scale better and for our largest experiments outperform their English-only counterparts demonstrating positive transfer from other tasks. For our largest experiments, joint models also slightly outperform English-only models even when not adjusting for compute spent per task.
+    - > for small models trained with moderate amounts of compute, there is indeed negative transfer between tasks and languages: joint models underperform English-only models trained for the same amount of compute. However, multitask and multilingual models scale better and for our largest experiments outperform their English-only counterparts demonstrating positive transfer from other tasks. For our largest experiments, joint models also slightly outperform English-only models even when not adjusting for compute spent per task.
 
 ## [2021] SoundStream: An End-to-End Neural Audio Codec
 
@@ -482,4 +484,5 @@
 
 ---
 
-- TODO
+- **Abstract**:
+  - > We introduce Moshi, a speech-text foundation model and full-duplex spoken dialogue frame- work.  Current systems for spoken dialogue rely on pipelines of independent components, namely  voice  activity  detection,  speech  recognition,  textual dialogue  and  text-to-speech. Such frameworks cannot emulate the experience of real conversations.  First, their complex- ity induces a latency of several seconds between interactions.  Second, text being the inter- mediate modality for dialogue, non-linguistic information that modifies meaning— such as emotion or non-speech sounds— is lost in the interaction.  Finally, they rely on a segmenta- tion into speaker turns, which does not take into account overlapping speech, interruptions and interjections.  Moshi solves these independent issues altogether by casting spoken dia- logue as speech-to-speech generation. Starting from a text language model backbone, Moshi generates speech as tokens from the residual quantizer of a neural audio codec, while model- ing separately its own speech and that of the user into parallel streams.  This allows for the removal of explicit speaker turns, and the modeling of arbitrary conversational dynamics. We moreover extend the hierarchical semantic-to-acoustic token generation of previous work to first predict time-aligned text tokens as a prefix to audio tokens.  Not only this “Inner Monologue” method significantly improves the linguistic quality of generated speech, but we also illustrate how it can provide streaming speech recognition and text-to-speech.  Our re- sulting model is the first real-time full-duplex spoken large language model, with a theoret- ical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.

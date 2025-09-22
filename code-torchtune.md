@@ -15,10 +15,10 @@
   - [X] generation
   - [ ] models
     - [X] llama2
-    - [ ] llama3 - understand tokenizer more deeply
+    - [X] llama3
     - [X] llama3_1
     - [X] llama3_2
-    - [ ] llama3_2_vision - understand if this approach is applicable for EMG?
+    - [ ] llama3_2_vision
     - [X] llama3_3
   - [X] modules
     - [X] modules/*.py
