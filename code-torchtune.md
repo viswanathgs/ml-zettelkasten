@@ -1,7 +1,7 @@
 # [pytorch/torchtune](https://github.com/pytorch/torchtune)
 
 - **Created**: 2024-04-16
-- **Last Updated**: 2024-04-16
+- **Last Updated**: 2024-09-22
 - **Status**: `Paused`
 
 ---
@@ -12,6 +12,8 @@
   - [ ] data
   - [X] datasets
   - [ ] dev
+    - [ ] grpo
+    - [ ] rl
   - [X] generation
   - [ ] models
     - [X] llama2
