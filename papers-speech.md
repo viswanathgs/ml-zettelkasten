@@ -1,8 +1,8 @@
 # Speech/Audio
 
 - **Created**: 2025-07-16
-- **Last Updated**: 2025-09-22
-- **Status**: `In Progress`
+- **Last Updated**: 2025-09-25
+- **Status**: `Done`
 
 ---
 
@@ -18,7 +18,7 @@
 - [X] [2023] AudioPaLM: A Large Language Model That Can Speak and Listen - [paper](https://arxiv.org/abs/2306.12925)
 - [X] [2023] MusicGen: Simple and Controllable Music Generation - [paper](https://arxiv.org/abs/2306.05284)
 - [X] [2023] Speech-Llama: Prompting Large Language Models with Speech Recognition Abilities - [paper](https://arxiv.org/abs/2307.11795)
-- [ ] [2024] Moshi: a speech-text foundation model for real-time dialogue - [paper](https://arxiv.org/abs/2410.00037)
+- [X] [2024] Moshi: a speech-text foundation model for real-time dialogue - [paper](https://arxiv.org/abs/2410.00037)
 - [X] [2025] Sesame AI Conversational Speech Model - [blog](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice)
 
 ---
@@ -384,7 +384,7 @@
 ---
 
 - **Intro**:
-  - AudoPaLM: Fuses text and speech based LMs into a unified multimodal architecture. Combines the best of AudioLM and PaLM-2.
+  - AudioPaLM: Fuses text and speech based LMs into a unified multimodal architecture. Combines the best of AudioLM and PaLM-2.
   - Hitherto, although there have been LMs that combine text and audio (speech-to-text or text-to-speech models), the text tokens and audio tokens use different vocabularies. For example, in the case of AudioLM, although an autoregressive LM is a key component of the model, it's only trained on audio tokens (semantic and acoustic tokens obtained from w2v-BERT and SoundStream respectively, see AudioLM notes above). Among other things, audio and text token vocabularies being different means speech-to-text and text-to-speech will have to be two different models.
   - **AudioPaLM combines text and audio vocabularies into a multimodal single vocabulary, allowing for training a single model in both directions and arbitrary interleaving of speech and text**. A single model can then do speech recognition, text-to-speech synthesis, and speech-to-speech translation, unifying tasks that are traditionally solved by heterogeneous models into a single architecture and training run.
   - Initalized from a pretrained text-only LM such as PaLM-2.
@@ -447,7 +447,7 @@
     - **(a) Flattening pattern ($T \times Q$ timesteps)**: Baseline approach as in AudioLM. Flatten the outputs of all $Q$ streams, resulting in a sequence of $Q$ tokens per timestep predicted autoregressively. Fully satisfies dependencies along both $T$ and $Q$ axes, but wastefully.
     - **(b) Parallel pattern ($T$ timesteps)**: At each time step, the model predicts logits for all $Q$ codebooks in parallel. Fully satisifies dependency only along $T$ axis.
     - **(c) Coarse-first pattern ($T \times 2$ timesteps)**: First predict the tokens corresponding to zeroth/coarsest codebook for all $T$ timesteps autoregresively. Then, predict the remaining $Q-1$ codebook tokens in parallel for each of the $T$ timesteps, conditioned on the zeroth/coarsest codebook tokens. Partially satisifies dependencies along both $T$ and $Q$ axes.
-    - **(d) Delay pattern ($T + Q - 1$ timesteps)**: A pipelined approach with conceptual similarlity to pipeline parallelism bubble reduction strategies [[book-huggingface-ultra-scale-llm-training.md]]. Partially satisfies dependency along $T$ axis, fully satisfies dependency along $Q$ axis. See Fig 1.
+    - **(d) Delay pattern ($T + Q - 1$ timesteps)**: A pipelined approach with conceptual similarity to pipeline parallelism bubble reduction strategies [[book-huggingface-ultra-scale-llm-training.md]]. Partially satisfies dependency along $T$ axis, fully satisfies dependency along $Q$ axis. See Fig 1.
   - **(3) Model conditioning**:
     - **(a) Text conditioning**: Given a textual description matching the input audio, generate a conditioning tensor $C \in \mathbb{R}^{T_C \times D}$ where $D$ is embedding dim of the autoregresssive model, such as using a pretrained text encoder.
     - **(b) Melody conditioning**: Optionally also condition ussing the chromagram of another track.
@@ -481,8 +481,75 @@
 - **Date**: 2025-09-05
 - **Arxiv**: <https://arxiv.org/abs/2410.00037>
 - **Paperpile**: <https://app.paperpile.com/view/?id=c7c6bc77-662f-4dae-a0bb-88f49c929788>
+- **Code**: <https://github.com/kyutai-labs/moshi>
 
 ---
 
-- **Abstract**:
-  - > We introduce Moshi, a speech-text foundation model and full-duplex spoken dialogue frame- work.  Current systems for spoken dialogue rely on pipelines of independent components, namely  voice  activity  detection,  speech  recognition,  textual dialogue  and  text-to-speech. Such frameworks cannot emulate the experience of real conversations.  First, their complex- ity induces a latency of several seconds between interactions.  Second, text being the inter- mediate modality for dialogue, non-linguistic information that modifies meaning— such as emotion or non-speech sounds— is lost in the interaction.  Finally, they rely on a segmenta- tion into speaker turns, which does not take into account overlapping speech, interruptions and interjections.  Moshi solves these independent issues altogether by casting spoken dia- logue as speech-to-speech generation. Starting from a text language model backbone, Moshi generates speech as tokens from the residual quantizer of a neural audio codec, while model- ing separately its own speech and that of the user into parallel streams.  This allows for the removal of explicit speaker turns, and the modeling of arbitrary conversational dynamics. We moreover extend the hierarchical semantic-to-acoustic token generation of previous work to first predict time-aligned text tokens as a prefix to audio tokens.  Not only this “Inner Monologue” method significantly improves the linguistic quality of generated speech, but we also illustrate how it can provide streaming speech recognition and text-to-speech.  Our re- sulting model is the first real-time full-duplex spoken large language model, with a theoret- ical latency of 160ms, 200ms in practice, and is available at github.com/kyutai-labs/moshi.
+- **Intro**:
+  - Existing systems for spoken dialogue rely on pipelines of independent components: voice activity detection (VAD), speech recognition (ASR), textual dialogue (LLM), and text-to-speech (TTS). Limitations:
+    - **Limitation 1: Latency** of several seconds owing to multiple components in the pipeline.
+    - **Limitation 2: Textual information bottleneck** with non-linguistic information (emotion, non-speech sounds) being lost due to language understanding and generation happening in the textual domain.
+    - **Limitation 3: Turn-based modeling** doesn't take into account overlapping speech, interruptions, and backchanneling (non-interrupting interjections such as "Okay" and "I see").
+  - **Moshi**: Solves the above three limitations.
+    - **AudioPaLM-style unified multimodal LLM**. Augments a text LLM backbone to ingest and output discrete audio tokens natively.
+    - Processes input (user's) speech and output (its own) audio streams in parallel. **Full-duplex** (always listens and always generates audio tokens), removal of explicit speaker turns, enabling modeling of arbitrary conversational dynamics.
+    - AudioLM-style hierarchical semantic-to-acoustic token generation extended to support **Inner Monologue** - first predict time-aligned text tokens as a prefix to audio tokens. Improves linguistic quality of the generated speech, as well as provides streaming ASR and TTS capabilities.
+    - > **the first real-time full-duplex spoken large language model**, with a theoretical latency of 160ms, 200ms in practice
+  - **Contributions**:
+    - **(1) Helium (Text LLM)**: 7B-param text LLM pretrained on 2.1T English-only tokens.
+    - **(2) Mimi (Neural Audio Codec)**: RVQ-based codec to convert audio into discrete tokens and back. Unlike AudioLM's approach of using both semantic tokens (from a self-supervised speech model) and acoustic tokens (from a neural audio codec like SoundStream), Mimi distills semantic info directly into the first level of acoustic tokens.
+    - **(3) Moshi (Full-duplex audio-native LLM)**: Combines Helium with a smaller transformer model to predict audio tokens in a hierarchical and streaming fashion. Extended to model several audio streams in parallel to support full-duplex nature.
+    - **(4) Inner Monologue**: The hierarchical generation of AudioLM (coarse semantic tokens to fine acoustic tokens) extended to also generate time-aligned text tokens before audio tokens. Improves the length and quality of generated speech. By forcing a delay between text and audio tokens enables streaming ASR and streaming TTS capabilities.
+  - **On what makes full-duplex possible**: <https://chatgpt.com/share/68d55a14-feb0-8005-afa5-e569ed3982ca>
+- **Model** (Fig 1):
+  - **(1) Pre-trained text-only LLM (Helium)**:
+    - Standard autoregressive transformer with some architectural tweaks. 7B-param, Engligh-only, trained on 2.1T tokens.
+    - To be used as the pre-trained checkpoint to initialize the "Temporal Transformer" of Moshi ("Temporal Transformer" in contrast to "Depth Transformer", see RQ-Transformer [[papers-vision.md]])).
+  - **(2) Audio Tokenization via Neural Audio Codec (Mimi)** (Fig 2):
+    - Prior art (AudioLM): Hierarchical modeling of semantic tokens (clustering representations from a pretrained SSL model) for long-term coarse linguistic information and acoustic tokens (SoundStream/Encodec) for fine-grained high-quality audio reconstruction.
+      - But this is not streaming friendly.
+      - **Semantic tokens are usually non-causal** and computed offline (such as via clustering self-supervised representations).
+      - > To discretize waveforms into audio tokens, we introduce Mimi, a neural audio codec (Zeghidour et  al., 2022;  Defossez et  al., 2023) that operates as an autoencoder with a discrete bottleneck (van den Oord et al., 2017). In the literature, and following the terminology defined by Borsos et al. (2022), these tokens are referred to as acoustic tokens, as they model fine audio details and are optimized for high-quality reconstruction.  While these acoustic tokens provide appropriate targets for conditioned text-to-audio models (e.g. text-to- speech (Wang et al., 2023) or text-to-music (Copet et al., 2023)), unconditioned speech generation requires combining them with semantic tokens extracted from self-supervised speech models (Baevski et al., 2020; Hsu et al., 2021; Chung et al., 2021). Unlike their acoustic counterpart, semantic tokens do not allow for reconstructing high-quality audio but correlate strongly with linguistic content. This similarity with language allows generating intelligible and consistent speech, even without text conditioning, by using semantic audio tokens as a prefix to predicting acoustic tokens. Yet, this hybrid tokenization approach is not compatible with real-time generation. Semantic tokens are typically not causal and can thus only be computed in an offline manner. Moreover, generating acoustic and semantic tokens with separate encoders represents a non-negligible computational burden.
+    - Mimi's approach (Fig 2): **Distill semantic info from a pretrained SSL model into the first RVQ level of SoundStream**
+      - To enable the above, the causal conv/deconv architecture of the SoundStream encoder-decoder is augmented with transformers (with causal attention mask) at the bottleneck with a context of 20s so that long-range semantic dependencies can be learned.
+        - > Both its initial frame size and overall stride correspond to 80ms, meaning that given a first audio frame of 80ms, Mimi outputs a first latent timestep, which can be decoded to 80ms of output audio.
+      - **Distillation loss**: Cosine similarity between the output of the first RVQ level and embeddings from a non-causal SSL model (WavLM in this case), after applying average-pooling and lienar projections as appropriate for aligning the frame-rate and dimensionality respectively.
+        - But distilling semantic info onto the first RVQ level conflicts with reconstruction and adversarial losses of the codec and the generated audio quality.
+        - Alternative approach: Decouple semantic distillation from RVQ. Distill semantic info from pretrained SSL representations into a plain VQ, and in parallel apply an RVQ focused on acoustic tokens (without any semantic distillation), and have their outputs summed. Now both semantic and acoustic tokens can be used for reconstruction, but no longer have the contraint that acoustic info be conserved in the residual of the semantic quantizer.
+  - **(3) Generative Audio Modeling (Moshi)** (Fig 3 & 4):
+    - **Core features**:
+      - (i) Extends Helium (text-only LLM) to support audio tokens produced by Mimi (neural audio codec).
+      - (ii) Full-duplex: models two audio streams - the user's and the system's.
+      - (iii) Inner Monologue: jointly models the system's output text and audio to improve the quality of interactions.
+    - **RQ-Transformer** [[papers-vision.md]] (Fig 3):
+      - Factorize autoregressive modeling along temporal (using a larger "Temporal Transfomer") and quantization level/depth (using a smaller "Depth Transformer").
+      - Sum of learnt embeddings corresponding to all semantic/acoustic tokens at time $t-1$ -> Temporal Transformer -> temporal latent representation $z_t$ -> Depth Transformer -> autoregressive generation of all semantic/acoustic tokens at time $t$.
+      - **Notation**: Tokens $A_{t,q}$ where timestamp $t \in \{1,...,T\}$ and quantization level/depth $q \in \{1,...,Q\}$ (with $q=1$ corresponding to the semantic token)
+      - **Temporal Transfomrer**: At time $t$, takes as input $\sum_{q=1}^{Q} emb(A_{t-1,q})$ and outputs latent $z_t$. Initialized with Helium text-only LLM weights.
+      - **Depth Transformer**: For each depth/level $q$, $z_t$ is fed into the depth transformer with the inputs $\{z_t + emb(A_{t,0}), z_t + emb(A_{t,1}), ..., z_t + emb(A_{t,Q-1})\}$ to generate the outputs tokens $\{A_{t,1},...,A_{t,Q}\}$ autoregressively. $A_{t,0} = 0$ to start the autoregressive generation process. Initialized with random weights.
+    - **Acoustic delay** (Fig 4):
+      - In RQ-Transformer, instead of having the depth transformer (a weaker model) predict the semantic token $A_{t,1}$ for time $t$ as well as all the acoustic tokens $\{A_{t,2},...,A_{t,Q}\}for time $t$, introduce a temporal delay between the semantic and acoustic tokens such that the acoustic tokens are predicted one timestep later than the corresponding semantic token. This leads to more stable generation.
+      - The output of depth transformer at time $t$ with an acoustic delay of 1 timestep: $\{A_{t,1},A_{t-1,2},...,A_{t-1,Q}\}$
+      - Intuition: The interdependence between the semantic and acoustic tokens is more complex than the interdependence amongst the acoustic tokens. The larger temporal transformer could model this better than the smaller depth transformer.
+      - Also see "Codebook interleaving patterns" under MusicGen.
+    - **Multi-stream modeling** (Fig 4):
+      - The whole architecture so far is fully causal and streaming friendly thanks to distilling semantic information into the neural audio codec.
+      - This means, architecture can be directly extended to take in multiple audio streams.
+      - Given the system's generated audio tokens $A_{t,q}$ and the audio tokens input by the user $A'_{t,q}$, apply the same acoustic delay to both and extend RQ-Transformer to operate over both token streams at each timestep.
+      - Note: This is primarily made possible by the causal and streaming nature of the architecture more than anything else. <https://chatgpt.com/share/68d55a14-feb0-8005-afa5-e569ed3982ca>
+      - Pre-trained with single-stream data with Whisper transcription for text ground-truth, and then finetuned for multi-stream with datasets consisting of diarized paired conversations.
+    - **Inner Monolgue** (Fig 4):
+      - Further improves performance by additionally modeling the textual representation of Moshi's own speech in parallel. Trivial extension given multi-stream modeling above - text tokens are just another stream alongside moshi's audio token stream and the user's audio token stream.
+      - Whisper generated text transcription corresponding to Moshi's audio stream is used for training. For user's audio stream, the text token stream just has padding tokens.
+      - The only thing to make sure is that the text token stream and Moshi's audio token stream are aligned. Text tokens are usually more compact than audio tokens, so alignment is done via a combination of relying on Whisper's timestamps and filling in gaps with padding tokens.
+      - Architecturally, the Depth Transformer is extended to first generate the text token for time $t$, and then autoregressively the semantic token for time $t$, and then the acoustic tokens for time $t-1$ (given acoustic delay of 1 timestep).
+      - This can be seen as an **extension of the hierarchical semantic-to-acoustic generation introduced by AudioLM to first generate text tokens prior to the semantic and acoustic tokens**.
+    - **Deriving streaming ASR and TTS**:
+      - **Streaming ASR**: Introduce a delay between audio and text (audio ahead of text), and sample only the text tokens while using the ground-truth audio tokens.
+      - **Streaming TTS**: Introduce a delay between audio and text (text ahead of audio), and sample only the audio tokens while using the ground-truth text tokens.
+      - > By setting the audio ahead of the text, the content of the text will be dictated by what audio has been sampled in the previous steps. In particular, by sampling only the text tokens, while using the ground truth audio tokens and discarding the prediction of the model for them,  one obtain a streaming Automatic Speech Recognition model, which also provides precise word level alignment. On the other hand, by changing the text delay so that the text is ahead of the audio tokens, the content of the audio is dictated by the text content. Once more, given a sequence of properly padded text tokens, one obtain a streaming Text-To-Speech model.
+    - **Inference**:
+      - At time $t$, sample the text token, the semantic token $A_{t,1}$ and the acoustic tokens $\{A_{t-1,2},...,A_{t-1,Q}\}$ corresponding to Moshi's generated audio.
+      - The predictions for the semantic token $A'_{t,1}$ and the acoustic tokens $\{A'_{t-1,2},...,A'_{t-1,Q}\}$ corresponding to the user's audio are ignored and the actual/incoming user's audio tokens are used.
+        - > However, modeling the user stream as output allows generating simulated dialogues, which is necessary for offline evaluation as in Section 5.6.
+      - > **no explicit boundaries for the change of turns between the user and Moshi: Moshi can speak and listen at all time, and do both at once if needed**. In particular, when the user speaks and Moshi stays silent, the corresponding audio tokens for Moshi’s stream decode into “natural silence”, a near silent waveform, instead of having a fixed, well defined value; At the same time, Moshi’s text stream will be filled with PAD tokens. As a result, the text stream can provide interesting ways of controlling Moshi, for instance, forcing the sampling of a EPAD token will make Moshi start talking immediately.
