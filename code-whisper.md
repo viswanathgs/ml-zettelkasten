@@ -1,7 +1,7 @@
 # [openai/whisper](https://github.com/openai/whisper)
 
-- **Created**: 2024-09-05
-- **Last Updated**: 2024-09-22
+- **Created**: 2025-09-05
+- **Last Updated**: 2025-09-22
 - **Status**: `Done`
 
 ---

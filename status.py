@@ -37,7 +37,7 @@ def main():
         if header:
             headers.append(header)
 
-    df = pd.DataFrame(headers).sort_values(by=["status", "created", "last_updated"])
+    df = pd.DataFrame(headers).sort_values(by=["status", "last_updated", "created"])
     for status, group in df.groupby("status"):
         print(f"\n### Status: {status} ({len(group)}) ###")
         # print(group.drop(columns=["status"]).to_string(index=False))
