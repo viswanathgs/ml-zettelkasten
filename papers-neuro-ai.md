@@ -6,7 +6,7 @@
 
 ---
 
-- [ ] <https://www.biorxiv.org/content/10.1101/055624v1>
+- [ ] [2016] Could a neuroscientist understand a microprocessor? - [paper](https://www.biorxiv.org/content/10.1101/055624v1)
 - [ ] <https://arxiv.org/abs/1911.09451>
 - [ ] <https://www.nature.com/articles/s41593-019-0520-2>
 - [ ] <https://www.thetransmitter.org/neuroai/accepting-the-bitter-lesson-and-embracing-the-brains-complexity/>
@@ -16,6 +16,7 @@
 - [ ] [2023] Blake Richards: The study of plasticity has always been about gradients. <https://physoc.onlinelibrary.wiley.com/doi/full/10.1113/JP282747>
 - [ ] [2023] The connectome of an insect brain - [paper](https://www.biorxiv.org/content/10.1101/2022.11.28.516756v1)
 - [ ] [2025] [Joshua Vogelstein, JHU] Biological Processing Units (BPU): Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures - [paper](https://arxiv.org/abs/2507.10951)
+- [ ] <https://www.youtube.com/watch?v=5deMwNtBBP0>, <https://anayebi.github.io/files/slides/Embodied_CMU_RISeminar_2025.pdf>
 
 ---
 
@@ -26,6 +27,20 @@
 - Edges aren't symmetric:
   - A -> B means neuron A’s axon terminal synapses onto neuron B’s dendrite.
   - The opposite is a different connection and may or may not exist.
+
+## [2016] Could a neuroscientist understand a microprocessor?
+
+- **Date**: 2025-10-01
+- **Biorxiv**: <https://www.biorxiv.org/content/10.1101/055624v1>
+- **Paperpile**: <https://app.paperpile.com/view/?id=aba6d1e5-b3a7-4cfb-9cf7-f3d758dbd4b9>
+
+---
+
+- **Abstract**:
+  - > There is a popular belief in neuroscience that we are primarily data limited, and that producing large, multimodal, and complex datasets will, with the help of advanced data analysis algorithms, lead to fundamental insights into the way the brain processes information. These datasets do not yet exist, and if they did we would have no way of evaluating whether or not the algorithmically-generated insights were sufficient or even correct. To address this, here we take a classical microprocessor as a model organism, and use our ability to perform arbitrary experiments on it to see if popular data analysis methods from neuroscience can elucidate the way it processes information. Microprocessors are among those artificial information processing systems that are both complex and that we understand at all levels, from the overall logical flow, via logical gates, to the dynamics of transistors. We show that the approaches reveal interesting structure in the data but do not meaningfully describe the hierarchy of information processing in the microprocessor. This suggests current analytic approaches in neuroscience may fall short of producing meaningful understanding of neural systems, regardless of the amount of data. Additionally, we argue for scientists using complex non-linear dynamical systems with known ground truth, such as the microprocessor as a validation platform for time-series and structure discovery methods.
+- **Intro**:
+  - > Here we will try to understand a known artificial system, a classical microprocessor by applying data analysis methods from neuroscience. We want to see what kind of an understanding would emerge from using a broad range of currently popular data analysis methods. To do so, we will analyze the connections on the chip, the effects of destroying individual transistors, single-unit tuning curves, the joint statistics across transistors, local activities, estimated connections, and whole-device recordings. For each of these, we will use standard techniques that are popular in the field of neuroscience. We find that many measures are surprisingly similar between the brain and the processor but that our results do not lead to a meaningful understanding of the processor. The analysis can not produce the hierarchical understanding of information processing that most students of electrical engineering obtain. It suggests that the availability of unlimited data, as we have for the processor, is in no way sufficient to allow a real understanding of the brain.
+  - TODO
 
 ## [2025] [Joshua Vogelstein, JHU] Biological Processing Units: Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures
 
@@ -50,3 +65,4 @@
       - (2) decision making (chess)
     - > By including peripheral sensors alongside the central BPU circuit, we test whether the BPU can support generalized cognition under realistic biological constraints.
     - > Finally, to understand how far this advantage can scale, we introduce a directed, signed degree–corrected Stochastic Block Model (DCSBM) that lets us expand the larval connectome up to 5x while faithfully preserving its block-level wiring statistics and synaptic polarity.
+- TODO
