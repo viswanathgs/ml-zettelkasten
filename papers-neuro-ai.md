@@ -1,7 +1,7 @@
 # Neuro AI
 
 - **Created**: 2025-10-01
-- **Last Updated**: 2025-10-01
+- **Last Updated**: 2025-10-13
 - **Status**: `In Progress`
 
 ---
@@ -47,11 +47,12 @@
 - **Date**: 2025-10-01
 - **Arxiv**: <https://arxiv.org/abs/2507.10951>
 - **Paperpile**: <https://app.paperpile.com/view/?id=5b87463f-3b9d-4ac5-9e37-a62466dd7243>
+- **Assistant**: <https://chatgpt.com/share/68ed19d2-d1a0-8005-aba7-df1b497288e4>
 
 ---
 
 - **Abstract**:
-  - > The complete connectome of the Drosophila larva brain of- fers a unique opportunity to investigate whether biologically evolved circuits can support artificial intelligence. We convert this wiring dia- gram into a Biological Processing Unit (BPU)—a fixed recurrent net- work derived directly from synaptic connectivity. Despite its modest size (3,000 neurons and 65,000 weights between them), the unmodified BPU achieves 98% accuracy on MNIST and 58% on CIFAR-10, surpassing size-matched MLPs. Scaling the BPU via structured connectome expan- sions further improves CIFAR-10 performance, while modality-specific ablations reveal the uneven contributions of different sensory subsystems. On the ChessBench dataset, a lightweight GNN-BPU model trained on only 10,000 games achieves 60% move accuracy, nearly 10x better than any size transformer. Moreover, CNN-BPU models with ∼ 2M param- eters outperform parameter-matched Transformers, and with a depth-6 minimax search at inference, reach 91.7% accuracy, exceeding even a 9M- parameter Transformer baseline. These results demonstrate the potential of biofidelic neural architectures to support complex cognitive tasks and motivate scaling to larger and more intelligent connectomes in future work.
+  - > The complete connectome of the Drosophila larva brain offers a unique opportunity to investigate whether biologically evolved circuits can support artificial intelligence. We convert this wiring diagram into a Biological Processing Unit (BPU)—a fixed recurrent network derived directly from synaptic connectivity. Despite its modest size (3,000 neurons and 65,000 weights between them), the unmodified BPU achieves 98% accuracy on MNIST and 58% on CIFAR-10, surpassing size-matched MLPs. Scaling the BPU via structured connectome expansions further improves CIFAR-10 performance, while modality-specific ablations reveal the uneven contributions of different sensory subsystems. On the ChessBench dataset, a lightweight GNN-BPU model trained on only 10,000 games achieves 60% move accuracy, nearly 10x better than any size transformer. Moreover, CNN-BPU models with ∼2M parameters outperform parameter-matched Transformers, and with a depth-6 minimax search at inference, reach 91.7% accuracy, exceeding even a 9M-parameter Transformer baseline. These results demonstrate the potential of biofidelic neural architectures to support complex cognitive tasks and motivate scaling to larger and more intelligent connectomes in future work.
 - **Intro**
   - <https://www.biorxiv.org/content/10.1101/2022.11.28.516756v1> mapped **an entire Drosophila larval connectome of 3k neurons and 65k weights** between them.
     - Opportunity to examine a fully nature-optimized neural net.
@@ -63,6 +64,33 @@
     - Evalauted on two categories of tasks:
       - (1) sensory processing (MNIST, CIFAR-10)
       - (2) decision making (chess)
-    - > By including peripheral sensors alongside the central BPU circuit, we test whether the BPU can support generalized cognition under realistic biological constraints.
-    - > Finally, to understand how far this advantage can scale, we introduce a directed, signed degree–corrected Stochastic Block Model (DCSBM) that lets us expand the larval connectome up to 5x while faithfully preserving its block-level wiring statistics and synaptic polarity.
-- TODO
+    - TODO: > By including peripheral sensors alongside the central BPU circuit, we test whether the BPU can support generalized cognition under realistic biological constraints.
+    - TODO: > Finally, to understand how far this advantage can scale, we introduce a directed, signed degree–corrected Stochastic Block Model (DCSBM) that lets us expand the larval connectome up to 5x while faithfully preserving its block-level wiring statistics and synaptic polarity.
+- **BPU Architecture**: (Fig 1)
+  - The entire connectome is used as a **fixed-weight recurrent core**, with only the input and output projections trained. Anologous to **reservoir computing**.
+  - **Axon-to-dendrite connectivity adjacency matrix** (from electron microscopy) as the **signed directed recurrent weight matrix**. Directional polarity (excitatory or inhibitory) assigned to each connection by multiplying synaptic counts with neurotransmitter-based annotations.
+  - **Neurons partitioned into three functional pools** based on anatomical annotations:
+    - **(i) Sensory Neurons (S)** (N = 430): Responsible for encoding external stimuli. Those receiving inputs from sensory modalities (vision, olfactory, etc).
+    - **(ii) Output Neurons (O)** (N = 218): Motor neurons and others projecting to muscles / effectors, etc.
+    - ***(iii) Internal Neurons (I)** (N = 2304): All other neurons.
+  - **Recurrent dynamics**:
+    - $S(t+1) = f(W_{SS}S(t) + W_{IS}I(t) + W_{OS}O(t) + W_{XS}x(t))$
+    - $I(t+1) = f(W_{IS}S(t) + W_{II}I(t) + W_{IO}O(t))$
+    - $O(t+1) = f(W_{OS}S(t) + W_{OI}I(t) + W_{OO}O(t)))$
+    - $y(t+1) = W_{YO}O(t+1)$
+    - $S(t)$, $O(t)$, $I(t)$ are the hidden states of sensory, internal, and output neuron pools respectively at time $t$.
+    - $x(t)$ is the external input at time $t$, $y(t)$ is output at time $t$.
+    - W_{XS} and W_{YO} are the input and output projections - these are the only ones trained (via gradient descent).
+    - All other weights are submatrices extracted from the axon-to-dendrite connectivity adjacency matrix, and fixed/frozen.
+    - For the non-linearity $f(.)$, ReLU is used for practical purposes (no biological grounding).
+    - The above network is unrolled and run for 5-10 timesteps matching the average sensory-to-motor path length in the connectome.
+      - > To preserve biological plausibility, we constrain the temporal depth of recurrent processing (i.e., the number of time steps T) to match the characteristic synaptic propagation path length observed in the Drosophila sensory pathways.
+- **Directed, Signed Degree-Corrected Stochastic Block Model (DCSBM)**:
+  - TODO
+- **Results**:
+  - TODO
+- **Discussion**:
+  - > Our results demonstrate that the complete Drosophila larval connectome, with- out any structural modification, can serve as an efficent neural substrate for complex tasks such as image recognition and chess puzzle solving. **This suggests that even circuits evolved for simpler behaviors possess a significant latent computational capacity**.
+  - > Future work could explore refining the connectome with task-specific adaptations, such as structure-aware rescaling or constrained plasticity mechanisms [19, 20], without losing its biological inductive priors.
+  - > Another important direction for future research is understanding how dif- ferent parts of the connectome contribute to task performance. Our ablation studies focused on sensory neuron types, but functional specialization may depend on **richer circuit motifs, such as feedback loops, recurrent clusters, or region-specific pathways** that cannot be captured by simple type-based removal. Elucidating the causal roles of these substructures remains an important open question.
+  - > **The ultimate goal—though ambitious—is clear: leveraging detailed connectomic data, starting from the simplest complete brain structures, to build increasingly intelligent and capable AI**.
