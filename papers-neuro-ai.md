@@ -1,7 +1,7 @@
 # Neuro AI
 
 - **Created**: 2025-10-01
-- **Last Updated**: 2025-10-13
+- **Last Updated**: 2025-10-14
 - **Status**: `In Progress`
 
 ---
@@ -9,13 +9,14 @@
 - [ ] [2016] Could a neuroscientist understand a microprocessor? - [paper](https://www.biorxiv.org/content/10.1101/055624v1)
 - [ ] <https://arxiv.org/abs/1911.09451>
 - [ ] <https://www.nature.com/articles/s41593-019-0520-2>
-- [ ] <https://www.thetransmitter.org/neuroai/accepting-the-bitter-lesson-and-embracing-the-brains-complexity/>
+- [X] [2025] [Eva Dyer, Blake Richards] Accepting “the bitter lesson” and embracing the brain’s complexity - [blog](https://www.thetransmitter.org/neuroai/accepting-the-bitter-lesson-and-embracing-the-brains-complexity/)
 - [ ] [2020] A natural lottery ticket winner: Reinforcement learning with ordinary neural circuits
 - [ ] [2021] Can a fruit fly learn word embeddings? <https://arxiv.org/abs/2101.06887>
 - [ ] [2023] Incorporating neuro-inspired adaptability for continual learning in artificial intelligence.
 - [ ] [2023] Blake Richards: The study of plasticity has always been about gradients. <https://physoc.onlinelibrary.wiley.com/doi/full/10.1113/JP282747>
 - [ ] [2023] The connectome of an insect brain - [paper](https://www.biorxiv.org/content/10.1101/2022.11.28.516756v1)
-- [ ] [2025] [Joshua Vogelstein, JHU] Biological Processing Units (BPU): Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures - [paper](https://arxiv.org/abs/2507.10951)
+- [X] [2025] [Joshua Vogelstein, JHU] Biological Processing Units (BPU): Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures - [paper](https://arxiv.org/abs/2507.10951)
+- TODO: references in BPU paper
 - [ ] <https://www.youtube.com/watch?v=5deMwNtBBP0>, <https://anayebi.github.io/files/slides/Embodied_CMU_RISeminar_2025.pdf>
 
 ---
@@ -85,12 +86,16 @@
     - For the non-linearity $f(.)$, ReLU is used for practical purposes (no biological grounding).
     - The above network is unrolled and run for 5-10 timesteps matching the average sensory-to-motor path length in the connectome.
       - > To preserve biological plausibility, we constrain the temporal depth of recurrent processing (i.e., the number of time steps T) to match the characteristic synaptic propagation path length observed in the Drosophila sensory pathways.
-- **Directed, Signed Degree-Corrected Stochastic Block Model (DCSBM)**:
-  - TODO
-- **Results**:
-  - TODO
+- **Connectome expansion via a Directed, Signed DCSBM (Degree-Corrected Stochastic Block Model)**:
+  - The larval connectome has only 3k neurons. How do we make the network larger while preserving its statistics and motifs?
+  - Let $W \in R^{N \times N}$ be the original adjacency matrix of the connectome. The goal is to construct a larger $W' \in R^{fN \times fN}$ where $f \in {1, 2, ..., 5}$ is the expansion factor, while being faithful to the structure/wiring/weights of the original connectome (sensor/internal/output neuron pools, weights and sign distributions, etc).
+  - See Section 2.2 in the paper or <https://chatgpt.com/share/68ed19d2-d1a0-8005-aba7-df1b497288e4> for how the DCSBM is fit. The original connectome becomes an exact subgraph of the expanded model.
+- **Results** (Fig 2-5):
+  - Baseline for MNIST and CIFAR: Two-layer MLP with only the input->hidden and hidden->output layers trained, and the internal hidden->hidden weights randomly initialized and frozen (resembling a reservoir).
+  - 98% (BPU) vs 97% (2-layer MLP with random reservoir) on MNIST, 58% (BPU) vs 52% (2-layer MLP with random reservoir) on CIFAR. Gap increases as the model size is made larger via DCSBM expansion (with the MLP baseline model size increasing proportionately as well).
+  - ChessBench results in Section 2.4 and Fig 4,5.
 - **Discussion**:
   - > Our results demonstrate that the complete Drosophila larval connectome, with- out any structural modification, can serve as an efficent neural substrate for complex tasks such as image recognition and chess puzzle solving. **This suggests that even circuits evolved for simpler behaviors possess a significant latent computational capacity**.
   - > Future work could explore refining the connectome with task-specific adaptations, such as structure-aware rescaling or constrained plasticity mechanisms [19, 20], without losing its biological inductive priors.
-  - > Another important direction for future research is understanding how dif- ferent parts of the connectome contribute to task performance. Our ablation studies focused on sensory neuron types, but functional specialization may depend on **richer circuit motifs, such as feedback loops, recurrent clusters, or region-specific pathways** that cannot be captured by simple type-based removal. Elucidating the causal roles of these substructures remains an important open question.
+  - > Another important direction for future research is understanding how different parts of the connectome contribute to task performance. Our ablation studies focused on sensory neuron types, but functional specialization may depend on **richer circuit motifs, such as feedback loops, recurrent clusters, or region-specific pathways** that cannot be captured by simple type-based removal. Elucidating the causal roles of these substructures remains an important open question.
   - > **The ultimate goal—though ambitious—is clear: leveraging detailed connectomic data, starting from the simplest complete brain structures, to build increasingly intelligent and capable AI**.
