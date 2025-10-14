@@ -8,10 +8,10 @@
 
 - [ ] [2014] Bahdanau, Neural machine translation by jointly learning to align and translate
 - [ ] [2015] Attention-Based Models for Speech Recognition — [paper](https://arxiv.org/abs/1506.07503)
-- [X] [2016] Neural Machine Translation of Rare Words with Subword Units — [paper](https://arxiv.org/abs/1508.07909)
+- [X] [2015] Neural Machine Translation of Rare Words with Subword Units — [paper](https://arxiv.org/abs/1508.07909)
+- [ ] SentencePiece ([code](https://github.com/google/sentencepiece))
 - [ ] [2017] Faiss: Billion-scale similarity search with GPUs — [paper](https://arxiv.org/abs/1702.08734)
 - [ ] [2018] Subword Regularization: Improving Neural Network Translation Models with Multiple Subword Candidates — [paper](https://arxiv.org/abs/1804.10959)
-- [ ] Tokenizer: Byte-pair encoding (BPE, [paper](https://arxiv.org/abs/1508.07909)) and SentencePiece ([code](https://github.com/google/sentencepiece))
 - [ ] titoken
 - [ ] Attention is all you need
 - [ ] [2018] The Annotated Transformer — [blog](https://nlp.seas.harvard.edu/annotated-transformer/)
@@ -35,7 +35,7 @@
 - [ ] TODO GQA — [paper](https://arxiv.org/abs/2305.13245v1)
 - [ ] TODO Gumbel-Softmax
 
-## [2016] Neural Machine Translation of Rare Words with Subword Units
+## [2015] Neural Machine Translation of Rare Words with Subword Units
 
 - **Date**: 2025-03-26
 - **Arxiv**: <https://arxiv.org/abs/1508.07909>
