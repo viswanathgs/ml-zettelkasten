@@ -6,6 +6,7 @@
 
 ---
 
+- [ ] [2016] [Adam Marblestone, Greg Wayne] Towards an integration of deep learning and neuroscience - [paper](https://arxiv.org/abs/1606.03813)
 - [ ] [2016] Could a neuroscientist understand a microprocessor? - [paper](https://www.biorxiv.org/content/10.1101/055624v1)
 - [ ] <https://arxiv.org/abs/1911.09451>
 - [ ] <https://www.nature.com/articles/s41593-019-0520-2>
@@ -21,13 +22,15 @@
 
 ---
 
-## Terminology
+## [2016] [Adam Marblestone, Greg Wayne] Towards an integration of deep learning and neuroscience
 
-- Axons: specialized for sending signals (presynaptic terminals)
-- Dendrites: specialized for receiving signals (postsynaptic sites)
-- Edges aren't symmetric:
-  - A -> B means neuron A’s axon terminal synapses onto neuron B’s dendrite.
-  - The opposite is a different connection and may or may not exist.
+- **Date**: 2025-10-16
+- **Arxiv**: <https://arxiv.org/abs/1606.03813>
+- **Paperpile**: <https://app.paperpile.com/view/?id=54e3be56-f28c-4eaa-8b78-85aa9c8919df>
+
+---
+
+- TODO
 
 ## [2016] Could a neuroscientist understand a microprocessor?
 
@@ -54,6 +57,12 @@
 
 - **Abstract**:
   - > The complete connectome of the Drosophila larva brain offers a unique opportunity to investigate whether biologically evolved circuits can support artificial intelligence. We convert this wiring diagram into a Biological Processing Unit (BPU)—a fixed recurrent network derived directly from synaptic connectivity. Despite its modest size (3,000 neurons and 65,000 weights between them), the unmodified BPU achieves 98% accuracy on MNIST and 58% on CIFAR-10, surpassing size-matched MLPs. Scaling the BPU via structured connectome expansions further improves CIFAR-10 performance, while modality-specific ablations reveal the uneven contributions of different sensory subsystems. On the ChessBench dataset, a lightweight GNN-BPU model trained on only 10,000 games achieves 60% move accuracy, nearly 10x better than any size transformer. Moreover, CNN-BPU models with ∼2M parameters outperform parameter-matched Transformers, and with a depth-6 minimax search at inference, reach 91.7% accuracy, exceeding even a 9M-parameter Transformer baseline. These results demonstrate the potential of biofidelic neural architectures to support complex cognitive tasks and motivate scaling to larger and more intelligent connectomes in future work.
+- **Basic Terminology**:
+  - Axons: specialized for sending signals (presynaptic terminals)
+  - Dendrites: specialized for receiving signals (postsynaptic sites)
+  - Edges aren't symmetric:
+    - A -> B means neuron A’s axon terminal synapses onto neuron B’s dendrite.
+    - The opposite is a different connection and may or may not exist.
 - **Intro**
   - <https://www.biorxiv.org/content/10.1101/2022.11.28.516756v1> mapped **an entire Drosophila larval connectome of 3k neurons and 65k weights** between them.
     - Opportunity to examine a fully nature-optimized neural net.
@@ -65,8 +74,8 @@
     - Evalauted on two categories of tasks:
       - (1) sensory processing (MNIST, CIFAR-10)
       - (2) decision making (chess)
-    - TODO: > By including peripheral sensors alongside the central BPU circuit, we test whether the BPU can support generalized cognition under realistic biological constraints.
-    - TODO: > Finally, to understand how far this advantage can scale, we introduce a directed, signed degree–corrected Stochastic Block Model (DCSBM) that lets us expand the larval connectome up to 5x while faithfully preserving its block-level wiring statistics and synaptic polarity.
+    - > By including peripheral sensors alongside the central BPU circuit, we test whether the BPU can support generalized cognition under realistic biological constraints.
+    - > Finally, to understand how far this advantage can scale, we introduce a directed, signed degree–corrected Stochastic Block Model (DCSBM) that lets us expand the larval connectome up to 5x while faithfully preserving its block-level wiring statistics and synaptic polarity.
 - **BPU Architecture**: (Fig 1)
   - The entire connectome is used as a **fixed-weight recurrent core**, with only the input and output projections trained. Anologous to **reservoir computing**.
   - **Axon-to-dendrite connectivity adjacency matrix** (from electron microscopy) as the **signed directed recurrent weight matrix**. Directional polarity (excitatory or inhibitory) assigned to each connection by multiplying synaptic counts with neurotransmitter-based annotations.
