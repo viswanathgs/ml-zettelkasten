@@ -11,12 +11,13 @@
 - [ ] <https://arxiv.org/abs/1911.09451>
 - [ ] <https://www.nature.com/articles/s41593-019-0520-2>
 - [X] [2025] [Eva Dyer, Blake Richards] Accepting “the bitter lesson” and embracing the brain’s complexity - [blog](https://www.thetransmitter.org/neuroai/accepting-the-bitter-lesson-and-embracing-the-brains-complexity/)
+- [ ] 2025 [Ed Boyden, Konrad Kording] Whole-brain, bottom-up neuroscience: The time for it is now - [blog](https://www.thetransmitter.org/computational-neuroscience/whole-brain-bottom-up-neuroscience-the-time-for-it-is-now/)
 - [ ] [2020] A natural lottery ticket winner: Reinforcement learning with ordinary neural circuits
 - [ ] [2021] Can a fruit fly learn word embeddings? <https://arxiv.org/abs/2101.06887>
 - [ ] [2023] Incorporating neuro-inspired adaptability for continual learning in artificial intelligence.
 - [ ] [2023] Blake Richards: The study of plasticity has always been about gradients. <https://physoc.onlinelibrary.wiley.com/doi/full/10.1113/JP282747>
 - [ ] [2023] The connectome of an insect brain - [paper](https://www.biorxiv.org/content/10.1101/2022.11.28.516756v1)
-- [X] [2025] [Joshua Vogelstein, JHU] Biological Processing Units (BPU): Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures - [paper](https://arxiv.org/abs/2507.10951)
+- [X] [2025] [Joshua Vogelstein] Biological Processing Units (BPU): Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures - [paper](https://arxiv.org/abs/2507.10951)
 - TODO: references in BPU paper
 - [ ] <https://www.youtube.com/watch?v=5deMwNtBBP0>, <https://anayebi.github.io/files/slides/Embodied_CMU_RISeminar_2025.pdf>
 

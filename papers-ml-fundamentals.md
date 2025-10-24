@@ -7,6 +7,7 @@
 ---
 
 - [ ] [2014] Bahdanau, Neural machine translation by jointly learning to align and translate
+- [ ] [2014] Neural Turing Machines - [paper](https://arxiv.org/abs/1410.5401)
 - [ ] [2015] Attention-Based Models for Speech Recognition — [paper](https://arxiv.org/abs/1506.07503)
 - [X] [2015] Neural Machine Translation of Rare Words with Subword Units — [paper](https://arxiv.org/abs/1508.07909)
 - [ ] SentencePiece ([code](https://github.com/google/sentencepiece))
