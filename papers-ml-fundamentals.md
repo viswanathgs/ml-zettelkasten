@@ -46,8 +46,8 @@
 ---
 
 - Neural Machine Translation (NMT) is an open vocabulary problem. Previously, fixed word-level vocabulary was used with back-off to dictionary lookup for out-of-vocabulary (OOV) words. This doesn't work well, often not scalable (eg., compound words in Deutsch), isn't fully learned/e2e due to dictionary fallback, etc.
-- Goal: Open-vocabulary NMT without dictionary back-off. Solution: Subword units.
-- Contributions:
+- **Goal**: Open-vocabulary NMT without dictionary back-off. Solution: Subword units.
+- **Contributions**:
   - (1) Demonstrating subword-level NMT can work, doesn't require any dictionary fallback, is simpler and effective.
   - (2) Adapting Byte Pair Encoding (BPE) for subword tokenization.
 - Competing tradeoff between vocabulary size and text size (aka token length). Want to minimize both, but minimizing one increases the other:
@@ -55,7 +55,7 @@
   - Other extreme: word-level tokenization. Small token length / text size, but very large vocab and still can't account for all words (rare words) and will need to fallback to dictionary translation for OOV words.
   - A balanced approach: Short lists of unsegmented words with subword-units for rare words.
   - BPE (Byte Pair Encoding): The above intermediate approach is manual. Alternatively, BPE allows learning a vocab that strikes this balance and provides a good compression rate.
-- Byte Pair Encoding (BPE):
+- **Byte Pair Encoding (BPE)**: Also see [minbpe](https://github.com/karpathy/minbpe) in [[karpathy-curriculum.md]]
   - Iteratively replaces the most frequent pair of bytes in a sequence with a single, unused byte.
   - Applying this to word segmentation by merging characters or character sequences rather than bytes.
   - Ref: Algorithm 1
@@ -63,9 +63,9 @@
   - Each merge op produces a new symbol which represents a characater n-gram. Frequent n-grams (or whole words) are eventually merged into a single symbol.
   - Final symbol vocab size = initial symbol vocab size + number of merge ops.
   - The number of merge ops is the only hyperparam to control.
-- Two methods of applying BPE:
-  - Independent BPE: Separate tokenization for source and target vocabularies. Compact text and vocab size.
-  - Joint BPE: A single tokenization combining the source and target vocabularies. More consistent source and target segmentations (eg., avoids segmenting the same name differently in the source and target languages, which would make it a harder translation problem to learn)
+- **Two methods of applying BPE for Machine Translation**:
+  - **Independent BPE**: Separate tokenization for source and target vocabularies. Compact text and vocab size.
+  - **Joint BPE**: A single tokenization combining the source and target vocabularies. More consistent source and target segmentations (eg., avoids segmenting the same name differently in the source and target languages, which would make it a harder translation problem to learn).
 
 ## [2021] RASP: Thinking Like Transformers
 
