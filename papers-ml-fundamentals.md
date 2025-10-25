@@ -16,7 +16,7 @@
 - [ ] titoken
 - [ ] Attention is all you need
 - [ ] [2018] The Annotated Transformer — [blog](https://nlp.seas.harvard.edu/annotated-transformer/)
-- [ ] [2019] The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks - [paper](https://arxiv.org/abs/1803.03635)
+- [X] [2018] The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks - [paper](https://arxiv.org/abs/1803.03635)
 - [ ] [2020] Efficient Transformers: A Survey — [paper](https://arxiv.org/abs/2009.06732)
 - [X] [2021] RASP: Thinking Like Transformers — [paper](https://arxiv.org/abs/2106.06981)
 - [ ] [2020] Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning — [paper](https://arxiv.org/abs/2012.13255)
@@ -176,3 +176,50 @@
 - Second-level / fine quantizer
   - Product Quantization
   - TODO
+
+## [2018] The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks
+
+- **Date**: 2025-10-24
+- **Arxiv**: <https://arxiv.org/abs/1803.03635>
+- **Paperpile**: <https://app.paperpile.com/view/?id=54b808a1-e559-4046-8c8b-f24a26e58144>
+- **Assistant**: <https://chatgpt.com/share/68fcea86-f42c-8005-a232-37da8d46b74a>
+
+---
+
+- **Abstract**:
+  - > Neural network pruning techniques can reduce the parameter counts of trained networks by over 90%, decreasing storage requirements and improving computational performance of inference without compromising accuracy. However, contemporary experience is that the sparse architectures produced by pruning are difficult to train from the start, which would similarly improve training performance.
+  - > We find that a standard pruning technique naturally uncovers subnetworks whose initializations made them capable of training effectively. Based on these results, we articulate the **lottery ticket hypothesis: dense, randomly-initialized, feed-forward networks contain subnetworks (winning tickets) that—when trained in isolation— reach test accuracy comparable to the original network in a similar number of iterations.  The winning tickets we find have won the initialization lottery: their connections have initial weights that make training particularly effective**.
+  - We present an algorithm to identify winning tickets and a series of experiments that support the lottery ticket hypothesis and the importance of these fortuitous initializations. We consistently find winning tickets that are less than 10-20% of the size of several fully-connected and convolutional feed-forward architectures for MNIST and CIFAR10. Above this size, the winning tickets that we find learn faster than the original network and reach higher test accuracy.
+- **Motivation**:
+  - Typically, pruning works by training a larger network, then prune, then fine-tune the unpruned weights. This works and creates a smaller network that performs just as well as the larger one.
+  - But, **if the smaller network can perform just as well after pruning, why can’t we train it directly from scratch?**
+  - May be it's not the smaller networks can't train, but that we don't know which ones to train.
+- **Lottery Ticket Hypothesis**:
+  - > **A randomly-initialized, dense neural network contains a subnetwork that is initialized such that—when trained in isolation—it can match the test accuracy of the original network after training for at most the same number of iterations.**
+  - Formally,
+    - Dense feed-forward neural network $f(x; \theta_0)$ with initial parameters $\theta_0$.
+    - Train a sparser network $f(x; m \odot \theta_0)$ with binary mask $m \in \{0, 1\}^{\lVert \theta_0 \rVert}$.
+    - There's a very sparse $m$ such that the same accuracy can be obtained with at most the same number of training iterations.
+  - These trainable subnetworks, winning tickets, can be found by standard unstructured pruning techniques.
+  - They have **won the initialization lottery with a combination of weights and connections capable of learning**.
+  - When the parameters of the winning tickets are randomly re-initialized ($f(x; m \odot \theta_0')$) as opposed to retaining the original random initialization prior to training and pruning ($f(x; m \odot \theta_0)$), they don't train effectively. Therefore, initialization matters.
+    - Up to moderate pruning (~80% unstructured sparsity), random reinit still works fine. But at extreme pruning (>98% sparsity), only the original init works.
+    - > One possible explanation for this behavior is these initial weights are close to their final values after training—that in the most extreme case, they are already trained. However, experiments in Appendix F show the opposite—that **the winning ticket weights move further than other weights**. This suggests that the **benefit of the initialization is connected to the optimization algorithm, dataset, and model**. For example, the winning ticket initialization might land in a region of the loss landscape that is particularly amenable to optimization by the chosen optimization algorithm.
+- **Identifying winning tickets**:
+  - Train a network normally as prune its smallest-magnitude weights. The remaning unpruned connections constitute the architecture of the winning ticket, and their weights are reset to its initialization prior to the original training.
+  - **One-shot pruning**:
+    - (1) Randomly init a neural net $f(x; \theta_0)$.
+    - (2) Train for $j$ iters, arriving at params $\theta_j$.
+    - (3) Prune $p\%$ of the smallest-magnitude params in $\theta_j$, creating a mask $m$.
+    - (4) Reset the remaining params to their values in $\theta_0$, creating the winning ticket $f(x; m \odot \theta_0)$.
+  - **Iterative pruning**:
+    - Instead of pruning $p\%$ of weights at once, repeat the above steps over $n$ rounds, pruning $p^{\frac{1}{n}}\%$ of the weights that survive the previous round.
+    - Leads to smaller networks compared to one-shot pruning while matching the accuracy of the original network.
+    - > On deeper networks (Resnet-18 and VGG-19), iterative pruning is unable to find winning tickets unless we train the networks with learning rate warmup.
+- **Lottery Ticket Conjecture**:
+  - **Untested conjecture: SGD seeks out and trains a subset of well-initialized weights**.
+  - > Dense, randomly-initialized networks are easier to train than the sparse networks that result from pruning because there are more possible subnetworks from which training might recover a winning ticket.
+- **Implications**:
+  - (1) **Improve training performance**: Training schemes that search for winning tickets and prune as early as possible?
+  - (2) **Design better networks**: New/sparse architectures and initialization schemes conducive to learning?
+  - (3) **Improve theoretical understanding of neural networks**: Why do randomly-initialized feed-forward networks seem to contain winning tickets?
