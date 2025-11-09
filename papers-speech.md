@@ -119,7 +119,7 @@
   - Instead of separately training BERT on discrete audio tokens, integrate a transformer over masked latent features and predict quantized units directly (with the whole network being trained e2e).
   - Downstream use on ASR by finetuning rather than using pretrained representations as inputs to train a separate ASR model.
   - On Librispeech, outperforms previous SoTA with 100x less labeled data.
-- **Model**: (Fig 1)
+- **Model** (Fig 1):
   - **(1) Encoder network (temporal conv, $f \colon X \to Z$)**: Takes raw audio $X$ and outputs latent representation $Z$.
   - **(2) Context network (masked transformer, $g \colon Z \to C$)**: Takes latent representation $Z$ with spans masked randomly, and outputs context embedding $C$.
     - The **inputs to the context network are continuous latent embeddings, with the quantized latents only used as targets in the contrastive loss**. This is different from vq-wav2vec where the context network takes quantized latent reconstructions as inputs.
@@ -307,7 +307,7 @@
     - **(i) Acoustic tokens** produced by SoundStream model (encoder + RVQ). See SoundStream notes for details. For a SoundStream model with $Q$ residual vector quantizers with $N$ bits allocated to each (such that the codebook size per quantizer is $2^N$), the raw audio waveform $x \in \mathbb{R}^T$ is transformed to $y \in \{1,...,2^N\}^{T_A \times Q}$ discrete tokens, where $T/T_A$ is the downsampling factor of the SoundStream encoder.
     - **(ii) Semantic tokens** produced by an intermediate layer of w2v-BERT after applying k-means and using the centroid indices. With $K$ clusters, the raw audio waveform $x \in \mathbb{R}^T$ is transformed to $z \in \{1,...,K\}^{T_S}$, where $T/T_S$ is the downsampling factor of the w2v-BERT encoder.
     - The combination of acoustic and semantic tokens helps reconcile conflicting requirements - fine-grained acoustic tokenization (more number of tokens for a fixed time window) helps reconstructing higher quality audio, whereas coarse-grained semantic tokenization (fewer number of tokens for a fixed time window) helps capture long-term dependency efficiently.
-  - **Hierarchical modeling of semantic and acoustic tokens**: (Fig 2)
+  - **Hierarchical modeling of semantic and acoustic tokens** (Fig 2):
     - In what order should the semantic and acoustic tokens be presented to language model training? Key insights:
       - (a) Semantic tokens (which capture linguistic context) should only be dependent on past semantic tokens and not on past acoustic tokens (which capture context needed for audio synthesis).
       - (b) The acoustic tokens generated with $Q$ residual vector quantizers, the earlier vector quantizers (say, $Q'$) capture coarse acoustic info whereas the later ones (the remaining $Q-Q'$ vector quantizers) capture finer acoustic info (see SoundStream for details). Given this, the finer acoustic tokens should be independent of semantic tokens given coarse acoustic tokens.
@@ -353,11 +353,11 @@
     - During inference, given the semantic tokens to condition on, SoundStorm **starts with all acoustic tokens masked out, and unmasks them RVQ level-by-level over multiple steps, predicting multiple tokens in parallel per step within a level**. During training, a masking scheme is to support this inference scheme.
     - Two orders-of-magnitude faster than AudioLM's acoustic token generation.
 - **Method**:
-  - **Architecture (Fig 1)**:
+  - **Architecture** (Fig 1):
     - > we interleave the time-aligned conditioning tokens with the SoundStream tokens at the frame level, embed the resulting sequence, sum the embeddings corresponding to the same frame, including the embedding of the conditioning token, and pass the resulting continuous embeddings to a Conformer.
     - > Consequently, the sequence length for bidirectional self-attention in the Conformer is determined by the number of SoundStream frames (typically 50 per second), and thus is independent of the number of RVQ levels $Q$.
     - > At the output side, we use $Q$ dense layers as heads to produce the target SoundStream tokens.
-  - **Masking (Fig 1)**:
+  - **Masking** (Fig 1):
     - **MaskGIT-style masking and parallel decoding per RVQ level in a coarse-to-fine order**.
     - **Training-time masking scheme** to mimic the decoding procedure during inference.
       - (i) Semantic tokens (to condition acoustic tokens on) are never masked.
