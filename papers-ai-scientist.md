@@ -8,7 +8,7 @@
 
 - [ ] AlphaTensor
 - [X] [2023] FunSearch: Making new discoveries in mathematical sciences using Large Language Models - [paper](https://www.nature.com/articles/s41586-023-06924-6)
-- [ ] [2025] AlphaEvolve: A coding agent for scientific and algorithmic discovery - [paper](https://arxiv.org/abs/2506.13131)
+- [X] [2025] AlphaEvolve: A coding agent for scientific and algorithmic discovery - [paper](https://arxiv.org/abs/2506.13131)
 - [ ] TODO sakana
 - [ ] TODO others?
 - [ ] TODO math paper from shubho
@@ -65,4 +65,16 @@
 
 ---
 
-- TODO
+- FunSearch on steroids. <https://chatgpt.com/share/69113795-79b0-8005-9220-a33795e6b892>
+  - evolving single function -> entire code file
+  - evolving up to 10-20 lines of code -> hundreds of lines of code
+  - evolves code in python -> any language
+  - needing fast evaluation (< 20 min on 1 CPU) -> supporting evaluation for hours, in parallel, on accelerators
+  - needing millions of LLM samples -> thousands of LLM samples
+  - small LLMs -> larger SoTA LLMs
+  - minimal context (from previous solutions, see FunSearch) -> rich context (more number of previous solutions, domain specific knowledge such as literature, human guidance, etc) and feedback (provided by another LLM) in prompts
+  - optimizing a single metric -> supporting simulteanous optimization of multiple metrics
+- **Abstract**:
+  - > In this white paper, we present AlphaEvolve, an evolutionary coding agent that substantially enhances capabilities of state-of-the-art LLMs on highly challenging tasks such as tackling open scientific problems or optimizing critical pieces of computational infrastructure. AlphaEvolve orchestrates an autonomous pipeline of LLMs, whose task is to improve an algorithm by making direct changes to the code. Using an evolutionary approach, continuously receiving feedback from one or more evaluators, AlphaEvolve iteratively improves the algorithm, potentially leading to new scientific and practical discoveries. We demonstrate the broad applicability of this approach by applying it to a number of important com- putational problems. When applied to optimizing critical components of large-scale computational stacks at Google, AlphaEvolve developed a more efficient scheduling algorithm for data centers, found a functionally equivalent simplification in the circuit design of hardware accelerators, and acceler- ated the training of the LLM underpinning AlphaEvolve itself. Furthermore, AlphaEvolve discovered novel, provably correct algorithms that surpass state-of-the-art solutions on a spectrum of problems in mathematics and computer science, significantly expanding the scope of prior automated discovery methods (Romera-Paredes et al., 2023). Notably, AlphaEvolve developed a search algorithm that found a procedure to multiply two 4 × 4 complex-valued matrices using 48 scalar multiplications; offering the first improvement, after 56 years, over Strassen’s algorithm in this setting. We believe AlphaEvolve and coding agents like it can have a significant impact in improving solutions of problems across many areas of science and computation.
+- > While the use of an automated evaluation metric offers AlphaEvolve a key advantage, it is also a limitation—in particular, **it puts tasks that require manual experimentation out of our scope**. Because problems in mathematics, computer science, and system optimization typically permit automated evaluation metrics, our efforts on AlphaEvolve focus on these domains.
+- > AlphaEvolve can also be seen as a test-time compute agent that, through its evolutionary procedure, significantly enhances the capability of the base LLM (compared to, e.g., repeated sampling). On one hand, this can be seen as a compelling demonstration of how machine feedback is able to **sustain test-time compute scaling up to regimes where new scientific discoveries and highly valuable practical optimizations are made**. On the other hand, a natural next step will be to consider **distilling the AlphaEvolve-augmented performance of the base LLMs into the next generation of the base models**. This can have intrinsic value and also, likely, uplift the next version of AlphaEvolve.
