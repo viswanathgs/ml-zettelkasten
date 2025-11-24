@@ -10,6 +10,9 @@
 - [ ] [2016] Could a neuroscientist understand a microprocessor? - [paper](https://www.biorxiv.org/content/10.1101/055624v1)
 - [ ] [2017] [Demis Hassabis, Matt Botvinick] Neuroscience-Inspired Artificial Intelligence - [paper](https://www.sciencedirect.com/science/article/pii/S0896627317305093)
 - [ ] [2018] [Greg Wayne] Unsupervised Predictive Memory in a Goal-Directed Agent - [paper](https://arxiv.org/abs/1803.10760)
+- [ ] [2019] [Tim Lillicrap] Backpropagation through time and the brain - [paper](https://www.sciencedirect.com/science/article/pii/S0959438818302009)
+- [ ] [2019] A critique of pure learning and what artificial neural networks can learn from animal brains - [paper](https://www.nature.com/articles/s41467-019-11786-6)
+- [ ] <https://www.jneurosci.org/content/18/24/10464>
 - [ ] <https://arxiv.org/abs/1911.09451>
 - [ ] <https://www.nature.com/articles/s41593-019-0520-2>
 - [X] [2025] [Eva Dyer, Blake Richards] Accepting “the bitter lesson” and embracing the brain’s complexity - [blog](https://www.thetransmitter.org/neuroai/accepting-the-bitter-lesson-and-embracing-the-brains-complexity/)
@@ -23,6 +26,7 @@
 - [X] [2024] [Sam Gershman] What have we learned about AI from studying the brain? - [paper](https://gershmanlab.com/pubs/NeuroAI_critique.pdf)
 - [X] [2025] [Joshua Vogelstein] Biological Processing Units (BPU): Leveraging an Insect Connectome to Pioneer Biofidelic Neural Architectures - [paper](https://arxiv.org/abs/2507.10951)
 - TODO: references in BPU paper
+- [ ] [2025] [Kris Jensen] A mechanistic theory of planning in prefrontal cortex - [paper](https://www.biorxiv.org/content/10.1101/2025.09.23.677709v1.abstract)
 - [ ] <https://www.youtube.com/watch?v=5deMwNtBBP0>, <https://anayebi.github.io/files/slides/Embodied_CMU_RISeminar_2025.pdf>
 - [ ] TODO "Are brain-inspired algorithms inherently unscalable compared to backpropagation?", <https://arxiv.org/abs/2505.13124>. Tweet-print: <https://x.com/InnocFrancesco/status/1978121338859503822>
 - [ ] <https://www.aria.org.uk/opportunity-spaces/nature-computes-better>

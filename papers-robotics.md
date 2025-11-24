@@ -12,6 +12,9 @@
 - [ ] TODO rl, world models papers
 - [ ] TODO 1x
 - [ ] TODO skild.ai
+- [ ] SkildAI
+  - [X] <https://www.skild.ai/blogs/building-the-general-purpose-robotic-brain>
+- [ ] V-JEPA
 
 ---
 
