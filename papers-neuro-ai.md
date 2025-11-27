@@ -141,3 +141,13 @@
 - **On energy efficiency**:
   - > A comparable level of commitment to biological plausibility has not yet pene- trated modern AI at large, due to the fact that there are many non-biological options that are more convenient and effective (though usually more energy-intensive). This further high- lights the fact that biology is not necessary for progress in AI, but it can serve as a useful directional signal for certain desiderata like energy efficiency
   - > When the Kempner Institute was created at Harvard, I suggested to the directors that if they really wanted to advance biologically inspired AI, they should restrict the compute budget to the wattage of a light bulb, which is all the brain needs. My suggestion was not followed.
+
+- [2025] [Kris Jensen] A mechanistic theory of planning in prefrontal cortex - [paper](https://www.biorxiv.org/content/10.1101/2025.09.23.677709v1.abstract)
+
+- **Date**: 2025-11-24
+- **Biorxiv**: <https://www.biorxiv.org/content/10.1101/2025.09.23.677709v1.abstract>
+- **Paperpile**: <https://app.paperpile.com/view/?id=f947cc84-420d-46c5-8c78-a05a6a36f9bb>
+
+---
+
+- TODO
