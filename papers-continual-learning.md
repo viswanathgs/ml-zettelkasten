@@ -12,6 +12,7 @@
 - [ ] [2024] [jovo] Prospective Learning: Learning for a Dynamic Future - [paper](https://arxiv.org/abs/2411.00109)
 - [ ] [2025] [jovo] Prospective Learning in Retrospect - [paper](https://arxiv.org/abs/2507.07965)
 - [ ] [2025] [jovo] Optimal control of the future via prospective foraging - [preprint](https://drive.google.com/file/d/1JDGTq-N8JJtMDWVmbN_FGU0HKyc4Rt8y/view?usp=sharing)
+- [ ] [2024] [sutton] Loss of plasticity in deep continual learning - [paper](https://www.nature.com/articles/s41586-024-07711-7)
 
 ---
 

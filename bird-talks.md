@@ -24,4 +24,7 @@
 - [X] [2025] [ICLR] Tim Rocktaschel, "Open-Endedness, World Models, and the Automation of Innovation": <https://iclr.cc/virtual/2025/invited-talk/36780>
 - [ ] [2025] Shuchao Bi, "Advancing the Frontier of Silicon Intelligence: the Past, Open Problems, and the Future": <https://www.youtube.com/watch?v=E22AOHAEtu4>
 - [ ] [2025] [Hot Chips] Noam Shazeer, "Predictions for the Next Phase of AI": <https://www.youtube.com/watch?v=v0beJQZQIGA>
-- [ ] [2025] [NeurIPS] Rich Sutton, "The Oak Architecture: A Vision of SuperIntelligence from Experience": <https://neurips.cc/virtual/2025/loc/san-diego/invited-talk/109601>
+- [X] [2025] [NeurIPS] Rich Sutton, "The Oak Architecture: A Vision of SuperIntelligence from Experience": <https://neurips.cc/virtual/2025/loc/san-diego/invited-talk/109601>, [Alberta Plan](http://www.incompleteideas.net/Talks/AlbertaPlan.pdf)
+- [ ] [2025] [NeurIPS] Melanie Mitchell, "On the Science of Alien Intelligences: Evaluating Cognitive Capabilities in Babies, Animals, and AI": <https://neurips.cc/virtual/2025/loc/san-diego/invited-talk/109607>
+- [ ] [2025] [NeurIPS] Andrew Saxe, Demystifying depth: Principles of learning in deep neural networks: <https://neurips.cc/virtual/2025/loc/san-diego/invited-talk/109602>
+- [ ] [2025] [NeurIPS] Kyunghyun Cho, "From Benchmarks to Problems - A Perspective on Problem Finding in AI": <https://neurips.cc/virtual/2025/loc/san-diego/invited-talk/109605>
