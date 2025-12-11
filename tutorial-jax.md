@@ -9,8 +9,8 @@
 - [X] Thinking in jax: <https://docs.jax.dev/en/latest/notebooks/thinking_in_jax.html>
 - [X] The sharp bits: <https://docs.jax.dev/en/latest/notebooks/Common_Gotchas_in_JAX.html>
 - [ ] Jax 101: <https://docs.jax.dev/en/latest/jax-101.html>
-  - [ ] `jax.jit`: <https://docs.jax.dev/en/latest/jit-compilation.html>
-  - [ ] `jax.vmap`: <https://docs.jax.dev/en/latest/automatic-vectorization.html>
+  - [X] `jax.jit`: <https://docs.jax.dev/en/latest/jit-compilation.html>
+  - [X] `jax.vmap`: <https://docs.jax.dev/en/latest/automatic-vectorization.html>
   - [ ] `jax.grad`: <https://docs.jax.dev/en/latest/automatic-differentiation.html>
   - [ ] pytrees: <https://docs.jax.dev/en/latest/pytrees.html>
   - [ ] `jax.random`: <https://docs.jax.dev/en/latest/random-numbers.html>
