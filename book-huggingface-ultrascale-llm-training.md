@@ -40,7 +40,7 @@
     - Params of each layer is sharded over DP ranks and materialized on the fly as needed via AllGather.
     - Reduces memory over ZeRO-2 at the cost of added 1 AllGather per layer per forward and per backward. For $L$ layers, $2 \times L - 1$ additional AllGather ops per training step (it's not $2 \times L$ as the last layer needs only one AllGather).
     - Forward computation for layer $L$ overlapped with AllGather for layer $L + 1$. Backward computation for layer $L$ overlapped with AllGather for layer $L - 1$.
-    - Aside: Toy implementation in <https://github.com/viswanathgs/LLM-Training-Puzzles> [[srush-ml-puzzles.md]].
+    - Aside: Toy implementation in <https://github.com/vishar0/LLM-Training-Puzzles> [[srush-ml-puzzles.md]].
 
 ## Tensor Parallelism (TP)
 
@@ -77,7 +77,7 @@
 
 ## Pipeline Parallelism (PP)
 
-- Aside: Toy implementation in <https://github.com/viswanathgs/LLM-Training-Puzzles> [[srush-ml-puzzles.md]].
+- Aside: Toy implementation in <https://github.com/vishar0/LLM-Training-Puzzles> [[srush-ml-puzzles.md]].
 - Layers split among a few GPUs, sequential dataflow.
 - Pro: Compared to Tensor Parallelism (TP), communication only at certain layer junctions. TP needs communications for each layer.
 - Downside: Lots of GPU idle time due to "bubble" when other layers are executing.
