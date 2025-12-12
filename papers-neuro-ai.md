@@ -10,6 +10,7 @@
 - [ ] [2016] Could a neuroscientist understand a microprocessor? - [paper](https://www.biorxiv.org/content/10.1101/055624v1)
 - [ ] [2017] [Demis Hassabis, Matt Botvinick] Neuroscience-Inspired Artificial Intelligence - [paper](https://www.sciencedirect.com/science/article/pii/S0896627317305093)
 - [ ] [2018] [Greg Wayne] Unsupervised Predictive Memory in a Goal-Directed Agent - [paper](https://arxiv.org/abs/1803.10760)
+- [ ] [2018] [Josh Merel, Greg Wayne] Hierarchical motor control in mammals and machines - [paper](https://www.nature.com/articles/s41467-019-13239-6)
 - [ ] [2019] [Tim Lillicrap] Backpropagation through time and the brain - [paper](https://www.sciencedirect.com/science/article/pii/S0959438818302009)
 - [ ] [2019] A critique of pure learning and what artificial neural networks can learn from animal brains - [paper](https://www.nature.com/articles/s41467-019-11786-6)
 - [ ] <https://www.jneurosci.org/content/18/24/10464>

@@ -1,11 +1,16 @@
 # Reinforcement Learning
 
 - **Created**: 2019-04
-- **Last Updated**: 2023-11-28
-- **Status**: `Paused`
+- **Last Updated**: 2023-12-12
+- **Status**: `In Progress`
 
 ---
 
+- [ ] [2000] [Andrew Ng] Algorithms for Inverse Reinforcement Learning - [paper](https://ai.stanford.edu/~ang/papers/icml00-irl.pdf)
+- [ ] [2013] Guided Policy Search - [paper](https://graphics.stanford.edu/projects/gpspaper/gps_full.pdf)
+- [ ] [2014] [David Silver] DPG: Deterministic Policy Gradient Algorithms - [paper](https://proceedings.mlr.press/v32/silver14.pdf)
+- [ ] [2015] [Tim Lillicrap, David Silver] Continuous control with deep reinforcement learning - [paper](https://arxiv.org/abs/1509.02971)
+- [ ] [2018] [Ben Recht] A Tour of Reinforcement Learning: The View from Continuous Control - [paper](https://arxiv.org/abs/1806.09460)
 - [ ] [2018] Investigating Human Priors for Playing Video Games - [paper](https://arxiv.org/abs/1802.10217)
 - [ ] [2020] Atari 100K: Model-Based Reinforcement Learning for Atari - [paper](https://arxiv.org/abs/1903.00374)
 - [ ] [2020] Revisiting Fundamentals of Experience Replay - [paper](https://arxiv.org/abs/2007.06700)
@@ -14,6 +19,43 @@
 - [ ] [2025] Kevin Murphy RL book: <https://arxiv.org/abs/2412.05265>
 
 ---
+
+## [2018] [Ben Recht] A Tour of Reinforcement Learning: The View from Continuous Control - [paper](https://arxiv.org/abs/1806.09460)
+
+- **Date**: 2025-12-10
+- **Arxiv**: <https://arxiv.org/abs/1806.09460>
+- **Paperpile**: <https://app.paperpile.com/view/?id=e49dc43d-6eb4-4832-8751-443e6964d352>
+
+---
+
+- **Intro**:
+  - > This survey aims to provide a language for the control and reinforcement learning communities to begin communicating, highlighting what each can learn from the other.  Controls is the theory of designing complex actions from well-specified models, while reinforcement learning often makes intricate, model-free predictions from data alone.  Yet both RL and control aim to design systems that  use  richly  structured  perception,  perform  planning  and  control  that  adequately  adapt  to environmental changes, and exploit safeguards when surprised by a new scenario.
+  - > I try  to  put  RL  and  control  techniques  on  the  same  footing  through  a  case  study  of  the linear quadratic regulator (LQR) with unknown dynamics.  This baseline will illuminate the var- ious  trade-offs  associated  with  techniques  from  RL  and  control.
+  - > “model-free”  methods  popular  in  deep  reinforcement  learning  are  considerably  less effective in both theory and practice than simple model-based schemes when applied to LQR. Per- haps surprisingly, I also show cases where these observations continue to hold on more challenging nonlinear applications.  I then argue that model-free and model-based perspectives can be unified, combining their relative merits.
+- **RL - optimal control when the dynamics are unknown**:
+  - > find a sequence of inputs that drives a dynamical system to maximize some objective beginning with minimal knowledge of how the system responds to inputs.
+  - > Since the dynamics are stochastic, the optimal control problem typically allows a controller to observe the state before deciding upon the next action [12].  This allows a controller to continually mitigate uncertainty through feedback.  Hence, rather than optimizing over deterministic sequences of actions $a_t$, we instead optimize over policies. A control policy (or simply “a policy”) is a function, $\pi$, that takes a trajectory from a dynamical system and outputs a new control action.  Note that $\pi$ gets access only to previous states and control actions.
+  - > we can’t solve this optimization problem using standard optimization methods unless we know the state transidion dynamics.  We must learn something about the dynamical system and subsequently choose the best policy based on our knowledge.
+  - > The main paradigm in contemporary RL is to play the following game.  We decide on a policy $\pi$ and horizon length $L$. Then we pass this policy either to a simulation engine or to a real physical system and are returned a trajectory $\tau_L$ and a sequence of rewards. We want to find a policy that maximizes the reward with the fewest total number of samples computed by the oracle, and we are allowed to do whatever we’d like with the previously observed trajectories and reward information when computing a new policy.  If we were to run $m$ queries with horizon length $L$, we would pay a total cost of $mL$.  However, we are free to vary our horizon length for each experiment. This is our oracle model and is called **episodic reinforcement learning** (See, for example Chapter 3 of Sutton and Barto [76], Chapter 2 of Puterman [58], or Dann and Brunskill [24]).  We want the expected reward to be high for our derived policy, but we also need the number of oracle queries to be small.
+  - > Do we decide an algorithm is best if it crosses some reward threshold in the fewest number of samples?  Or is it best if it achieves the highest reward given a fixed budget of samples?  Or maybe there’s a middle ground?
+- **RL vs supervised learning**:
+  - > A key distinguishing aspect of RL is the control action $a$.  Unlike in prediction,  the practitioner can vary $a$, which has implications both for learning (e.g., designing experiments to learn about a given system) and for control (e.g., choosing inputs to maximize reward).
+  - > There is a precarious trade-off that must be carefully considered:  reinforcement learning demands interventions with the promise that these actions will directly lead to valuable returns, but the resulting complicated feedback loops are hard to study in theory, and failures can have catastrophic consequences.
+- **RL Strategies**:
+  - **(1) Model-based RL**:
+    - fits a model of the state transitions to best match observed trajectories, and uses this to approximate the solution to the RL problem.
+  - **(2) Model-free RL**:
+    - eschews the need for the system's model, directly seeking a map from observations to actions.
+    - > The term “model-free” almost always means “no model of the state transition function” when casually claimed in reinforcement learning research.  However, this does not mean that modeling is not heavily built into the assumptions of model-free RL algorithms.
+    - **(a) Approximate Dynamic Programming / Value Based**:
+      - uses Bellman’s principle of optimality to approximate the RL problem using previously observed data.
+      - > Also troubling is the fact that we had to introduce the discount factor in order to get a simple Bellman equation.  One can avoid discount factors,  but this requires considerably more sophisticated analysis.  Large discount factors do in practice lead to brittle methods, and the discount becomes a hyperparameter that must be tuned to stabilize performance.
+    - **(b) Policy Search / Policy Based**:
+      - directly searches for policies by using data from previous episodes in order to improve the reward.
+      - `REINFORCE` algorithm and log-likelihood trick.
+  - > The main question is which of these approaches makes the best use of samples and how quickly do the derived policies converge to optimality.
+- > **This survey has focused on “episodic” reinforcement learning and has steered clear of a much harder problem:  adaptive control.  In the adaptive setting, we want to learn the policy online.  We only get one trajectory.  The goal is, after a few steps, to have a model whose reward from here to eternity will be large.  This is very different, and much harder that what people are doing in RL. In episodic RL, you get endless access to a simulator.  In adaptive control, you get one go.**
+- > as soon as a  machine  learning  system  is  unleashed  in  feedback  with  humans,  that  system  is  a  reinforcement learning system.
 
 ## [2023] Bigger, Better, Faster (BBF): Human-level Atari with human-level efficiency
 
