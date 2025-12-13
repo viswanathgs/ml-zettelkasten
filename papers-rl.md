@@ -6,11 +6,16 @@
 
 ---
 
+- [[tutorial-rl-spinning-up-openai.md]]
+
+---
+
+- TODO papers in <https://spinningup.openai.com/en/latest/spinningup/keypapers.html>
 - [ ] [2000] [Andrew Ng] Algorithms for Inverse Reinforcement Learning - [paper](https://ai.stanford.edu/~ang/papers/icml00-irl.pdf)
 - [ ] [2013] Guided Policy Search - [paper](https://graphics.stanford.edu/projects/gpspaper/gps_full.pdf)
 - [ ] [2014] [David Silver] DPG: Deterministic Policy Gradient Algorithms - [paper](https://proceedings.mlr.press/v32/silver14.pdf)
 - [ ] [2015] [Tim Lillicrap, David Silver] Continuous control with deep reinforcement learning - [paper](https://arxiv.org/abs/1509.02971)
-- [ ] [2018] [Ben Recht] A Tour of Reinforcement Learning: The View from Continuous Control - [paper](https://arxiv.org/abs/1806.09460)
+- [X] [2018] [Ben Recht] A Tour of Reinforcement Learning: The View from Continuous Control - [paper](https://arxiv.org/abs/1806.09460)
 - [ ] [2018] Investigating Human Priors for Playing Video Games - [paper](https://arxiv.org/abs/1802.10217)
 - [ ] [2020] Atari 100K: Model-Based Reinforcement Learning for Atari - [paper](https://arxiv.org/abs/1903.00374)
 - [ ] [2020] Revisiting Fundamentals of Experience Replay - [paper](https://arxiv.org/abs/2007.06700)

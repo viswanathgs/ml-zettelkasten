@@ -18,6 +18,8 @@
 - [X] Chapter 6: convolution, max pooling, and general deep learning overview <https://neuralnetworksanddeeplearning.com/chap6.html>
   - skimmed through
 - [X] Appendix: Is there a simple algorithm for intelligence? <https://neuralnetworksanddeeplearning.com/sai.html>
+
+---
   
 ## Notes
 
